@@ -94,9 +94,12 @@ deploy_web() {
   fi
   log "vercel deploy"
   run bash -c "cd apps/web && npx vercel link --yes --project '$VERCEL_PROJECT' --token \"\$VERCEL_TOKEN\""
+  # Persisting env vars is best-effort: newer Vercel CLI gates names containing KEY/SECRET behind an
+  # interactive sensitivity prompt that can't be answered non-interactively. The values are what
+  # matter, and the deploy below injects both via --build-env (NEXT_PUBLIC_* are inlined at build).
   for kv in "NEXT_PUBLIC_API_BASE=$GATEWAY_URL" "NEXT_PUBLIC_DEMO_KEY=${DEMO_KEY:-<key>}"; do
     k=${kv%%=*}; v=${kv#*=}
-    run bash -c "cd apps/web && (npx vercel env rm '$k' production --yes --token \"\$VERCEL_TOKEN\" >/dev/null 2>&1 || true) && printf '%s' '$v' | npx vercel env add '$k' production --token \"\$VERCEL_TOKEN\""
+    run bash -c "cd apps/web && (npx vercel env rm '$k' production --yes --token \"\$VERCEL_TOKEN\" >/dev/null 2>&1 || true) && { printf '%s' '$v' | npx vercel env add '$k' production --token \"\$VERCEL_TOKEN\" || echo \"note: could not persist $k to Vercel project env (passed via --build-env at deploy)\"; }"
   done
   run bash -c "cd apps/web && npx vercel deploy --prod --yes --token \"\$VERCEL_TOKEN\" -b NEXT_PUBLIC_API_BASE='$GATEWAY_URL' -b NEXT_PUBLIC_DEMO_KEY='${DEMO_KEY:-<key>}' | tee '$ROOT/$STATE/vercel.log'"
   [[ $DRY -eq 1 ]] || { url=$(grep -oE 'https://[a-z0-9.-]+\.vercel\.app' "$STATE/vercel.log" | tail -1 || true); echo "vercel: ${url:-see $STATE/vercel.log}"; }

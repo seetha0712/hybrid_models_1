@@ -10,6 +10,7 @@ Char spans -> BIO tags via the fast tokenizer's offset_mapping. Metrics: entity-
 from __future__ import annotations
 
 import json
+import math
 import time
 
 from spectrum import common
@@ -83,8 +84,11 @@ def train_core(rows: list[dict], out_dir: str, *, epochs: int = 3, lr: float = 5
 
     dtr, dte = to_ds(tr), to_ds(te)
     model = AutoModelForTokenClassification.from_pretrained(BASE, num_labels=len(BIO), id2label=dict(enumerate(BIO)), label2id=BIO2ID)
+    # transformers 5 dropped warmup_ratio in favour of warmup_steps; keep the 6%-of-training warmup.
+    total_steps = math.ceil(len(dtr) / batch) * epochs
+    warmup_steps = max(10, int(0.06 * total_steps))
     args = TrainingArguments(output_dir=f"{out_dir}/_trainer", per_device_train_batch_size=batch, per_device_eval_batch_size=64, num_train_epochs=epochs,
-                             learning_rate=lr, weight_decay=0.01, warmup_ratio=0.06, logging_steps=50, save_strategy="no", report_to=[],
+                             learning_rate=lr, weight_decay=0.01, warmup_steps=warmup_steps, logging_steps=50, save_strategy="no", report_to=[],
                              fp16=torch.cuda.is_available(), dataloader_num_workers=2)
     trainer = Trainer(model=model, args=args, train_dataset=dtr, data_collator=DataCollatorForTokenClassification(tok))
     t0 = time.time()
@@ -137,10 +141,12 @@ def pii_train_main(epochs: int = 3, max_rows: int = 20000):
     tr = train_remote.remote(epochs, max_rows)
     ev = eval_remote.remote(max_rows)
     out = {**{k: v for k, v in tr.items() if k != "seqeval_report"}, **ev, "seqeval_report": tr.get("seqeval_report")}
-    print(json.dumps({k: v for k, v in out.items() if k != "seqeval_report"}, indent=2))
+    # seqeval/entity reports carry numpy scalars (e.g. int64 supports); coerce to native Python for JSON.
+    _np = lambda o: o.item() if hasattr(o, "item") else str(o)
+    print(json.dumps({k: v for k, v in out.items() if k != "seqeval_report"}, indent=2, default=_np))
     # persisted by eval.py --phase 3 (reads both); keep a copy here too
     import modal  # noqa
 
     with open("results/phase3_pii_eval.json", "w") as f:
-        json.dump(out, f, indent=1)
+        json.dump(out, f, indent=1, default=_np)
     print("wrote results/phase3_pii_eval.json")

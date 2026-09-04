@@ -13,7 +13,10 @@ DATASETS: dict[str, dict] = {
         "license_note": "Check the dataset card licence before external use.",
     },
     "banking77": {
-        "hf_id": "PolyAI/banking77",
+        # PolyAI/banking77 ships a loader script, which datasets>=4 refuses ("Dataset scripts are no
+        # longer supported"). legacy-datasets/banking77 is the parquet mirror: identical structure,
+        # label as a 77-way ClassLabel, 13,083 rows (10,003 train + 3,080 test). CC-BY-4.0.
+        "hf_id": "legacy-datasets/banking77",
         "description": "13,083 genuine online-banking customer queries, 77 intents (Casanueva et al. 2020). CC-BY-4.0.",
         "text_columns": ["text"],
         "label_columns": ["label"],

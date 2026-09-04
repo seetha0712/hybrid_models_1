@@ -69,12 +69,13 @@ def build(rng: random.Random, n_per: int = N_PER) -> tuple[list[Row], dict]:
             rows.append(Row(id=_rid(intent[:3], t), text=t[:1200], label=intent, meta={"source": source, "templated": templated}))
         report[intent] = f"{min(len(texts), n_per)} rows from {source}"
 
-    # chat <- banking77 (real)
+    # chat <- banking77 (real). legacy-datasets mirror is parquet (PolyAI/banking77 ships a script,
+    # which datasets>=4 refuses).
     try:
-        ds = load_dataset("PolyAI/banking77", split="train")
+        ds = load_dataset("legacy-datasets/banking77", split="train")
         texts = [ex["text"] for ex in ds]
         rng.shuffle(texts)
-        add("chat", texts, "PolyAI/banking77")
+        add("chat", texts, "legacy-datasets/banking77")
     except Exception as e:
         report["chat"] = f"FAILED {e!r}"
 
@@ -95,40 +96,41 @@ def build(rng: random.Random, n_per: int = N_PER) -> tuple[list[Row], dict]:
     except Exception as e:
         report["pii_redact"] = f"FAILED {e!r}"
 
-    # complex_analysis <- FinQA questions
+    # complex_analysis <- financial 10-K reasoning questions. virattt/financial-qa-10K is parquet and
+    # ungated (TheFinAI/flare-finqa is gated; the original FinQA repos ship loader scripts).
     try:
-        ds = load_dataset("TheFinAI/flare-finqa", split="test")
-        texts = _take(ds, n_per * 2, lambda ex: _first_str(ex, ["query", "question", "text"]))
+        ds = load_dataset("virattt/financial-qa-10K", split="train")
+        texts = _take(ds, n_per * 2, lambda ex: _first_str(ex, ["question", "query", "text"]))
         rng.shuffle(texts)
-        add("complex_analysis", [rng.choice(_FINQA_WRAP).format(t=t[:900]) for t in texts[:n_per]], "TheFinAI/flare-finqa")
+        add("complex_analysis", [rng.choice(_FINQA_WRAP).format(t=t[:900]) for t in texts[:n_per]], "virattt/financial-qa-10K")
     except Exception as e:
         report["complex_analysis"] = f"FAILED {e!r}"
 
-    # summarise + doc_classify <- EDGAR 10-K sections (streamed)
+    # summarise + doc_classify <- EDGAR 10-K excerpts (streamed). eloukas/edgar-corpus ships a loader
+    # script (refused by datasets>=4); this mirror is parquet with the 10-K text under `input`.
     try:
-        ds = load_dataset("eloukas/edgar-corpus", "year_2020", split="train", streaming=True)
-        secs = ["section_1", "section_1A", "section_7", "section_7A", "section_9A"]
+        ds = load_dataset("kritsadaK/EDGAR-CORPUS-Financial-Summarization", split="train", streaming=True)
         excerpts = []
         for ex in ds:
-            for s in secs:
-                v = ex.get(s)
-                if isinstance(v, str) and len(v) > 400:
-                    excerpts.append(v[:500])
+            v = _first_str(ex, ["input", "text", "document"])
+            if v and len(v) > 400:
+                excerpts.append(v[:500])
             if len(excerpts) >= n_per * 3:
                 break
         rng.shuffle(excerpts)
-        add("summarise", [rng.choice(_SUM_WRAP).format(t=t) for t in excerpts[:n_per]], "eloukas/edgar-corpus (+instruction wrappers)")
-        add("doc_classify", [rng.choice(_DOC_WRAP).format(t=t) for t in excerpts[n_per:2 * n_per]], "eloukas/edgar-corpus (+instruction wrappers)")
+        add("summarise", [rng.choice(_SUM_WRAP).format(t=t) for t in excerpts[:n_per]], "kritsadaK/EDGAR-CORPUS-Financial-Summarization (+instruction wrappers)")
+        add("doc_classify", [rng.choice(_DOC_WRAP).format(t=t) for t in excerpts[n_per:2 * n_per]], "kritsadaK/EDGAR-CORPUS-Financial-Summarization (+instruction wrappers)")
     except Exception as e:
         report["summarise"] = report["doc_classify"] = f"FAILED {e!r}"
 
-    # code <- CodeSearchNet python docstrings
+    # code <- CodeSearchNet python docstrings. code-search-net/code_search_net is the parquet mirror
+    # (the bare `code_search_net` id now resolves to an invalid loader-script URI under datasets>=4).
     try:
-        ds = load_dataset("code_search_net", "python", split="train", streaming=True, trust_remote_code=True)
+        ds = load_dataset("code-search-net/code_search_net", "python", split="train", streaming=True)
         texts = _take(ds, n_per * 2, lambda ex: (_first_str(ex, ["func_documentation_string"]) or "").split("\n")[0][:200] or None)
         texts = [t for t in texts if len(t) > 20]
         rng.shuffle(texts)
-        add("code", [rng.choice(_CODE_WRAP).format(t=t[0].lower() + t[1:]) for t in texts[:n_per]], "code_search_net/python (+instruction wrappers)")
+        add("code", [rng.choice(_CODE_WRAP).format(t=t[0].lower() + t[1:]) for t in texts[:n_per]], "code-search-net/code_search_net/python (+instruction wrappers)")
     except Exception as e:
         report["code"] = f"FAILED {e!r}"
 

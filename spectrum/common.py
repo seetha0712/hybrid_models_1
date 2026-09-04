@@ -64,11 +64,19 @@ TRAIN_PIP = [
     "transformers>=4.51,<6",
     "datasets>=3.0",
     "sentence-transformers>=3.3",
-    "seqeval>=1.2",
     "accelerate>=1.0",
     "peft>=0.15",
     "hf_transfer>=0.1.8",
 ]
+
+# seqeval 1.2.2 has no wheel and its legacy setup_requires pulls the latest setuptools_scm as a build
+# egg; setuptools_scm 10.2.3 is broken (imports the un-declared `vcs_versioning`), which fails the
+# build. Install it separately with a compatible setuptools_scm already on the env and build isolation
+# off, so setup_requires is satisfied from the working set instead of fetching the broken egg.
+def _install_seqeval(img: modal.Image) -> modal.Image:
+    return img.pip_install(
+        "setuptools>=68", "wheel", "setuptools-scm<9"
+    ).pip_install("seqeval>=1.2", extra_options="--no-build-isolation")
 
 _ENV = {"HF_HOME": VOL_HF, "HF_HUB_ENABLE_HF_TRANSFER": "1", "TOKENIZERS_PARALLELISM": "false"}
 
@@ -83,18 +91,20 @@ def _with_source(img: modal.Image) -> modal.Image:
 
 # CPU image: torch CPU wheel keeps the image small and cold starts short.
 cpu_image = _with_source(
-    modal.Image.debian_slim(python_version="3.11")
-    .pip_install("torch>=2.5", index_url="https://download.pytorch.org/whl/cpu")
-    .pip_install(*COMMON_PIP, *TRAIN_PIP)
-    .env(_ENV)
+    _install_seqeval(
+        modal.Image.debian_slim(python_version="3.11")
+        .pip_install("torch>=2.5", index_url="https://download.pytorch.org/whl/cpu")
+        .pip_install(*COMMON_PIP, *TRAIN_PIP)
+    ).env(_ENV)
 )
 
 # GPU image: CUDA torch for the T4 jobs (tiny-model training, LoRA, PII fine-tune, Qwen3-1.7B serving).
 gpu_image = _with_source(
-    modal.Image.debian_slim(python_version="3.11")
-    .pip_install("torch>=2.5")
-    .pip_install(*COMMON_PIP, *TRAIN_PIP)
-    .env(_ENV)
+    _install_seqeval(
+        modal.Image.debian_slim(python_version="3.11")
+        .pip_install("torch>=2.5")
+        .pip_install(*COMMON_PIP, *TRAIN_PIP)
+    ).env(_ENV)
 )
 
 VOLUMES = {VOL: volume}

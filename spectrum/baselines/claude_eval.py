@@ -100,6 +100,44 @@ def run_batch(client, *, model: str, system: list[dict], rows: list[Row], labels
     return {"batch_id": batch.id, "usage": agg}, per_row
 
 
+def run_sync(client, *, model: str, system: list[dict], rows: list[Row], labels: list[str], max_workers: int = 6) -> tuple[dict, list[dict]]:
+    """Synchronous fallback for when the Message Batches API is backlogged. Warms the prompt cache
+    with the first row, then classifies the rest concurrently so every later call is a cheap
+    cache_read. Returns the same (meta, per_row) shape as run_batch."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    def classify(r: Row):
+        return r.id, call_claude(client, model=model, system=system, user=classification_user_prompt(r.text),
+                                 schema=CLASSIFY_SCHEMA, max_tokens=64)
+
+    results = dict([classify(rows[0])])  # warm the cache before fanning out
+    if len(rows) > 1:
+        with ThreadPoolExecutor(max_workers=max_workers) as ex:
+            for rid, res in ex.map(classify, rows[1:]):
+                results[rid] = res
+
+    agg = {"in": 0, "cache_write": 0, "cache_read": 0, "out": 0}
+    per_row = []
+    for r in rows:
+        res = results[r.id]
+        rec = {"id": r.id, "gold": r.label, "split": r.split, "pred": "__error__", "confidence": None}
+        for k, v in res.usage.as_dict().items():
+            agg[k] += v
+        if res.usage.as_dict() != {"in": 0, "cache_write": 0, "cache_read": 0, "out": 0}:
+            rec["usage"] = res.usage.as_dict()
+        if res.stop_reason == "refusal":
+            rec["pred"] = "__refusal__"
+        elif res.json is not None:
+            rec["pred"] = _normalise(res.json.get("category"), labels)
+            rec["confidence"] = res.json.get("confidence")
+        elif res.text:
+            rec["pred"] = _normalise(res.text, labels)
+        if not res.ok and res.error:
+            rec["error"] = res.error
+        per_row.append(rec)
+    return {"batch_id": None, "mode": "sync", "usage": agg}, per_row
+
+
 def score(per_row: list[dict], labels: list[str]) -> dict:
     from sklearn.metrics import accuracy_score, f1_score
 
@@ -135,7 +173,7 @@ def latency_sample(client, *, model: str, system: list[dict], rows: list[Row], n
 
 
 @app.function(image=common.cpu_image, volumes=common.VOLUMES, secrets=[common.anthropic_secret], timeout=3 * 3600, cpu=1, memory=2048)
-def evaluate_remote(dataset: str, model_key: str, n: int, max_usd: float, yes: bool, latency_n: int) -> dict:
+def evaluate_remote(dataset: str, model_key: str, n: int, max_usd: float, yes: bool, latency_n: int, sync: bool = True) -> dict:
     common.ensure_dirs()
     rows = load_rows(f"{common.VOL_DATA}/{dataset}.jsonl")
     labels = label_names(rows)
@@ -146,15 +184,28 @@ def evaluate_remote(dataset: str, model_key: str, n: int, max_usd: float, yes: b
     subset = stratified_subset(rows, n)
     sys_tokens = count_tokens(client, model=model, system=system, user=classification_user_prompt(subset[0].text))
     p = load_pricing()["claude"][model]
-    est = claude_cost(model, Usage(input_tokens=sys_tokens + 40, output_tokens=20), batch=True) * len(subset)
-    print(f"model={model} system_tokens≈{sys_tokens} (cache_min={p['cache_min_tokens']}) rows={len(subset)} est_batch_cost=${est:.3f}")
+    if sync:
+        # Sync path warms the prompt cache on the first call, then every later call re-reads it at
+        # cache_read rates, so estimate that shape rather than the (much higher) uncached batch cost.
+        first = claude_cost(model, Usage(cache_creation_input_tokens=sys_tokens, input_tokens=40, output_tokens=20))
+        rest = claude_cost(model, Usage(cache_read_input_tokens=sys_tokens, input_tokens=40, output_tokens=20))
+        est = first + rest * max(len(subset) - 1, 0)
+        est_label = "est_sync_cost"
+    else:
+        est = claude_cost(model, Usage(input_tokens=sys_tokens + 40, output_tokens=20), batch=True) * len(subset)
+        est_label = "est_batch_cost"
+    print(f"model={model} system_tokens≈{sys_tokens} (cache_min={p['cache_min_tokens']}) rows={len(subset)} {est_label}=${est:.3f}")
     if sys_tokens < p["cache_min_tokens"]:
         print("WARNING: system prompt below cache minimum; live calls will not hit the cache")
     if est > max_usd and not yes:
         raise SystemExit(f"estimated ${est:.2f} > --max-usd {max_usd}; re-run with --yes")
-    meta, per_row = run_batch(client, model=model, system=system, rows=subset, labels=labels)
+    if sync:
+        print(f"mode=sync (Message Batches API bypassed); classifying {len(subset)} rows concurrently")
+        meta, per_row = run_sync(client, model=model, system=system, rows=subset, labels=labels)
+    else:
+        meta, per_row = run_batch(client, model=model, system=system, rows=subset, labels=labels)
     metrics = score(per_row, labels)
-    batch_cost = claude_cost(model, meta["usage"], batch=True)
+    batch_cost = claude_cost(model, meta["usage"], batch=not sync)
     lat = latency_sample(client, model=model, system=system, rows=subset, n=latency_n) if latency_n else {}
     live_cost_per_item = claude_cost(model, {k: int(v) for k, v in lat.get("avg_tokens", {}).items()}) if lat else None
     out = {"model": model, "model_key": model_key, "dataset": dataset, "technique": "in-context learning (zero-shot + few-shot), no training",

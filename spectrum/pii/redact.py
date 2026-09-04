@@ -11,7 +11,10 @@ from spectrum.pii import regex_baseline
 
 
 def merge(a: list[dict], b: list[dict]) -> list[dict]:
-    allspans = sorted(a + b, key=lambda d: (d["start"], -(d["end"] - d["start"])))
+    # On overlap prefer a specific label over the catch-all OTHER, then the longer span. This lets the
+    # near-perfect numeric regex (CARD/ACCT/…) win over a model span that only reached OTHER on the
+    # same digits, so cards redact as [CARD_n] rather than [OTHER_n].
+    allspans = sorted(a + b, key=lambda d: (d["start"], d["label"] == "OTHER", -(d["end"] - d["start"])))
     out, last = [], -1
     for s in allspans:
         if s["start"] >= last:
