@@ -1,41 +1,50 @@
 {
- "status": "placeholder",
- "note": "PLACEHOLDER until POST /batch_view has run against the deployed gateway.",
+ "status": "measured",
  "slm": {
   "tier": "R5_SLM",
   "model": "tiny-decoder-1.7M",
-  "n": 10000,
-  "accuracy": 0.85,
-  "wall_s": null,
-  "cost_usd": null,
-  "throughput_per_s": 251.8,
-  "cost_per_1m_usd": 0.139
+  "n": 2000,
+  "accuracy": 0.8595,
+  "wall_s": 4.65,
+  "cost_usd": 0.0001627984,
+  "throughput_per_s": 430.0,
+  "cost_per_1m_usd": 0.0814
  },
  "api": [
   {
    "tier": "R2_HAIKU",
    "model": "claude-haiku-4-5",
-   "n": 0,
+   "n": 50,
    "latency_ms": {
-    "p50": null,
-    "p95": null
+    "p50": 912.1,
+    "p95": 1566.3
    },
-   "avg_tokens": {},
-   "cost_per_task_usd": null,
-   "cost_per_1m_usd": null
+   "avg_tokens": {
+    "in": 22.1,
+    "cache_write": 104.7,
+    "cache_read": 5129.3,
+    "out": 15.2
+   },
+   "cost_per_task_usd": 0.0007399,
+   "cost_per_1m_usd": 739.9
   },
   {
    "tier": "R1_SONNET",
    "model": "claude-sonnet-5",
-   "n": 0,
+   "n": 50,
    "latency_ms": {
-    "p50": null,
-    "p95": null
+    "p50": 1831.3,
+    "p95": 2390.2
    },
-   "avg_tokens": {},
-   "cost_per_task_usd": null,
-   "cost_per_1m_usd": null
+   "avg_tokens": {
+    "in": 27.5,
+    "cache_write": 149.0,
+    "cache_read": 7303.0,
+    "out": 18.9
+   },
+   "cost_per_task_usd": 0.0020671,
+   "cost_per_1m_usd": 2067.1
   }
  ],
- "generated_at": 1788508137.2697573
+ "generated_at": 1788538143.2758663
 }
