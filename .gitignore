@@ -11,8 +11,6 @@ dist/
 node_modules/
 apps/web/.next/
 apps/web/out/
-apps/web/src/data/*.json
-!apps/web/src/data/.gitkeep
 # env / secrets
 .env
 .env.*

@@ -1,0 +1,41 @@
+{
+ "status": "placeholder",
+ "note": "PLACEHOLDER until POST /batch_view has run against the deployed gateway.",
+ "slm": {
+  "tier": "R5_SLM",
+  "model": "tiny-decoder-1.7M",
+  "n": 10000,
+  "accuracy": 0.85,
+  "wall_s": null,
+  "cost_usd": null,
+  "throughput_per_s": 251.8,
+  "cost_per_1m_usd": 0.139
+ },
+ "api": [
+  {
+   "tier": "R2_HAIKU",
+   "model": "claude-haiku-4-5",
+   "n": 0,
+   "latency_ms": {
+    "p50": null,
+    "p95": null
+   },
+   "avg_tokens": {},
+   "cost_per_task_usd": null,
+   "cost_per_1m_usd": null
+  },
+  {
+   "tier": "R1_SONNET",
+   "model": "claude-sonnet-5",
+   "n": 0,
+   "latency_ms": {
+    "p50": null,
+    "p95": null
+   },
+   "avg_tokens": {},
+   "cost_per_task_usd": null,
+   "cost_per_1m_usd": null
+  }
+ ],
+ "generated_at": 1788508137.2697573
+}

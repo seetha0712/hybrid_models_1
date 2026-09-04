@@ -1,0 +1,286 @@
+{
+ "status": "placeholder",
+ "note": "PLACEHOLDER: five illustrative routed requests so the dashboard renders offline. Replaced by real logged traffic via `modal run spectrum/eval.py --phase 2`.",
+ "rows": [
+  {
+   "ts": 1788507837.2697573,
+   "request_id": "demo01",
+   "text_preview": "Categorise: WHOLE FOODS MKT #10 SEATTLE WA",
+   "intent": "txn_categorise",
+   "intent_confidence": 0.96,
+   "plan": [
+    "R5_SLM",
+    "R2_HAIKU"
+   ],
+   "hops": [
+    {
+     "tier": "R5_SLM",
+     "model": "tiny-decoder-1.7M",
+     "ok": true,
+     "tokens": {},
+     "latency_ms": 3.4,
+     "cost_usd": 1.2e-07,
+     "confidence": 0.97,
+     "escalated": false
+    }
+   ],
+   "final_tier": "R5_SLM",
+   "escalated": false,
+   "n_tokens_est": 14,
+   "pii": {
+    "redacted_count": 0,
+    "sent_to_frontier": 0
+   },
+   "total_cost_usd": 1.2e-07,
+   "total_latency_ms": 4.1
+  },
+  {
+   "ts": 1788507897.2697573,
+   "request_id": "demo02",
+   "text_preview": "Categorise: SQ *UNKNOWN VENDOR 8821 AUSTIN TX",
+   "intent": "txn_categorise",
+   "intent_confidence": 0.94,
+   "plan": [
+    "R5_SLM",
+    "R2_HAIKU"
+   ],
+   "hops": [
+    {
+     "tier": "R5_SLM",
+     "model": "tiny-decoder-1.7M",
+     "ok": true,
+     "tokens": {},
+     "latency_ms": 3.2,
+     "cost_usd": 1.2e-07,
+     "confidence": 0.41,
+     "escalated": false
+    },
+    {
+     "tier": "R2_HAIKU",
+     "model": "claude-haiku-4-5",
+     "ok": true,
+     "tokens": {
+      "in": 30,
+      "cache_write": 0,
+      "cache_read": 4300,
+      "out": 18
+     },
+     "latency_ms": 820.0,
+     "cost_usd": 0.00055,
+     "confidence": "medium",
+     "escalated": true
+    }
+   ],
+   "final_tier": "R2_HAIKU",
+   "escalated": true,
+   "n_tokens_est": 15,
+   "pii": {
+    "redacted_count": 0,
+    "sent_to_frontier": 0
+   },
+   "total_cost_usd": 0.00055,
+   "total_latency_ms": 826.0
+  },
+  {
+   "ts": 1788507957.2697573,
+   "request_id": "demo03",
+   "text_preview": "Summarise this in three lines: The company reported revenue growth of 12% ...",
+   "intent": "summarise",
+   "intent_confidence": 0.9,
+   "plan": [
+    "R4_OPEN",
+    "R2_HAIKU"
+   ],
+   "hops": [
+    {
+     "tier": "R4_OPEN",
+     "model": "Qwen/Qwen3-1.7B",
+     "ok": true,
+     "tokens": {
+      "in": 210,
+      "cache_write": 0,
+      "cache_read": 0,
+      "out": 95
+     },
+     "latency_ms": 2900.0,
+     "cost_usd": 0.00047,
+     "confidence": "high",
+     "escalated": false
+    }
+   ],
+   "final_tier": "R4_OPEN",
+   "escalated": false,
+   "n_tokens_est": 180,
+   "pii": {
+    "redacted_count": 0,
+    "sent_to_frontier": 0
+   },
+   "total_cost_usd": 0.00047,
+   "total_latency_ms": 2910.0
+  },
+  {
+   "ts": 1788508017.2697573,
+   "request_id": "demo04",
+   "text_preview": "Draft a polite email to [PER_1] about the fee change; her card [CARD_1] ...",
+   "intent": "draft",
+   "intent_confidence": 0.88,
+   "plan": [
+    "R2_HAIKU",
+    "R1_SONNET"
+   ],
+   "hops": [
+    {
+     "tier": "R2_HAIKU",
+     "model": "claude-haiku-4-5",
+     "ok": true,
+     "tokens": {
+      "in": 120,
+      "cache_write": 0,
+      "cache_read": 0,
+      "out": 160
+     },
+     "latency_ms": 1400.0,
+     "cost_usd": 0.00092,
+     "confidence": "high",
+     "escalated": false
+    }
+   ],
+   "final_tier": "R2_HAIKU",
+   "escalated": false,
+   "n_tokens_est": 60,
+   "pii": {
+    "redacted_count": 2,
+    "sent_to_frontier": 0
+   },
+   "total_cost_usd": 0.00092,
+   "total_latency_ms": 1412.0
+  },
+  {
+   "ts": 1788508077.2697573,
+   "request_id": "demo05",
+   "text_preview": "Analyse the two hedging strategies in the memo and recommend one",
+   "intent": "complex_analysis",
+   "intent_confidence": 0.91,
+   "plan": [
+    "R1_OPUS"
+   ],
+   "hops": [
+    {
+     "tier": "R1_OPUS",
+     "model": "claude-opus-5",
+     "ok": true,
+     "tokens": {
+      "in": 900,
+      "cache_write": 0,
+      "cache_read": 0,
+      "out": 420
+     },
+     "latency_ms": 6200.0,
+     "cost_usd": 0.015,
+     "confidence": "high",
+     "escalated": false
+    }
+   ],
+   "final_tier": "R1_OPUS",
+   "escalated": false,
+   "n_tokens_est": 700,
+   "pii": {
+    "redacted_count": 0,
+    "sent_to_frontier": 0
+   },
+   "total_cost_usd": 0.015,
+   "total_latency_ms": 6215.0
+  }
+ ],
+ "metrics": {
+  "by_tier": [
+   {
+    "tier": "R2_HAIKU",
+    "tasks": 2,
+    "cost_usd": 0.00147,
+    "tokens_in": 150,
+    "tokens_out": 178,
+    "cache_read": 4300,
+    "escalations": 1,
+    "cost_per_task_usd": 0.000735,
+    "p50_ms": 1412.0,
+    "p95_ms": 826.0
+   },
+   {
+    "tier": "R5_SLM",
+    "tasks": 1,
+    "cost_usd": 0.0,
+    "tokens_in": 0,
+    "tokens_out": 0,
+    "cache_read": 0,
+    "escalations": 0,
+    "cost_per_task_usd": 1.2e-07,
+    "p50_ms": 4.1,
+    "p95_ms": 4.1
+   },
+   {
+    "tier": "R4_OPEN",
+    "tasks": 1,
+    "cost_usd": 0.00047,
+    "tokens_in": 210,
+    "tokens_out": 95,
+    "cache_read": 0,
+    "escalations": 0,
+    "cost_per_task_usd": 0.00047,
+    "p50_ms": 2910.0,
+    "p95_ms": 2910.0
+   },
+   {
+    "tier": "R1_OPUS",
+    "tasks": 1,
+    "cost_usd": 0.015,
+    "tokens_in": 900,
+    "tokens_out": 420,
+    "cache_read": 0,
+    "escalations": 0,
+    "cost_per_task_usd": 0.015,
+    "p50_ms": 6215.0,
+    "p95_ms": 6215.0
+   }
+  ],
+  "cumulative": [
+   {
+    "t": 1788507837.2697573,
+    "policy_usd": 0.0,
+    "flagship_usd": 0.000428,
+    "small_usd": 5e-06
+   },
+   {
+    "t": 1788507897.2697573,
+    "policy_usd": 0.00055,
+    "flagship_usd": 0.009268,
+    "small_usd": 1e-05
+   },
+   {
+    "t": 1788507957.2697573,
+    "policy_usd": 0.00102,
+    "flagship_usd": 0.010638,
+    "small_usd": 1.5e-05
+   },
+   {
+    "t": 1788508017.2697573,
+    "policy_usd": 0.00194,
+    "flagship_usd": 0.012478,
+    "small_usd": 2e-05
+   },
+   {
+    "t": 1788508077.2697573,
+    "policy_usd": 0.01694,
+    "flagship_usd": 0.018478,
+    "small_usd": 2.5e-05
+   }
+  ],
+  "pii_blocked_total": 2,
+  "n": 5,
+  "totals": {
+   "policy_usd": 0.01694,
+   "all_flagship_usd": 0.018478,
+   "all_small_usd": 2.5e-05
+  }
+ }
+}

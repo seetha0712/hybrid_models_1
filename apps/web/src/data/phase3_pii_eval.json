@@ -1,0 +1,47 @@
+{
+ "status": "placeholder",
+ "note": "PLACEHOLDER: regex baseline measured on the 60-row synthetic fixture; model rows null until `modal run spectrum/pii/train_pii.py` has run on ai4privacy FinPII.",
+ "base": "distilbert-base-multilingual-cased",
+ "technique": "full supervised fine-tuning (token classification)",
+ "n_params": null,
+ "n_train": 0,
+ "n_test": 60,
+ "epochs": null,
+ "train_seconds": null,
+ "token_level_seqeval_f1": null,
+ "model_union_regex": {
+  "precision": null,
+  "recall": null,
+  "f1": null,
+  "n": 0,
+  "per_label": {}
+ },
+ "regex_only": {
+  "precision": 0.6667,
+  "recall": 0.5,
+  "f1": 0.5714,
+  "n": 60,
+  "per_label": {
+   "ACCT": {
+    "f1": 0.0,
+    "support": 60
+   },
+   "EMAIL": {
+    "f1": 1.0,
+    "support": 60
+   },
+   "PER": {
+    "f1": 0.0,
+    "support": 60
+   },
+   "PHONE": {
+    "f1": 0.6667,
+    "support": 60
+   }
+  }
+ },
+ "latency_ms": {
+  "p50": null,
+  "p95": null
+ }
+}

@@ -27,6 +27,8 @@ tests/         pytest (no network)
 
 ## Quick start (Mac)
 
+**One command for everything:** see `docs/LOCAL_SETUP.md` — clone, fill `.env`, run `./scripts/run_all.sh --phase all`.
+
 ```bash
 python3.11 -m venv .venv && . .venv/bin/activate
 pip install torch --index-url https://download.pytorch.org/whl/cpu && pip install -e ".[train,serve,dev]"
