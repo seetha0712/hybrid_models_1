@@ -1,0 +1,104 @@
+{
+ "status": "placeholder",
+ "note": "PLACEHOLDER until `modal run spectrum/router/corpus.py && modal run spectrum/router/train_intent.py` has run.",
+ "encoder": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+ "technique": "frozen embeddings + calibrated logistic regression (linear probe)",
+ "n_train": 0,
+ "n_test": 0,
+ "labels": [
+  "chat",
+  "code",
+  "complex_analysis",
+  "doc_classify",
+  "draft",
+  "pii_redact",
+  "summarise",
+  "txn_categorise"
+ ],
+ "accuracy": null,
+ "macro_f1": null,
+ "confusion": [
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ]
+ ],
+ "reliability": [],
+ "train_seconds": null
+}

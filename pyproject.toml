@@ -1,0 +1,50 @@
+[project]
+name = "model-spectrum"
+version = "0.1.0"
+description = "The Model Spectrum, live: a hybrid-model-strategy demo (owned tiny SLM, LoRA SLM, open weights, frontier tiers) on Modal + Vercel"
+requires-python = ">=3.11"
+dependencies = [
+  "modal>=1.0",
+  "anthropic>=1.0",
+  "pydantic>=2.7",
+  "numpy>=1.26",
+  "pyyaml>=6",
+]
+
+[project.optional-dependencies]
+train = [
+  "torch>=2.5",
+  "tokenizers>=0.21",
+  "transformers>=4.51",
+  "peft>=0.15",
+  "datasets>=3.0",
+  "sentence-transformers>=3.3",
+  "scikit-learn>=1.6",
+  "seqeval>=1.2",
+  "joblib>=1.4",
+  "pandas>=2.2",
+]
+serve = [
+  "fastapi>=0.115",
+  "uvicorn>=0.30",
+  "httpx>=0.27",
+]
+dev = [
+  "pytest>=8",
+  "ruff>=0.6",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["spectrum*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

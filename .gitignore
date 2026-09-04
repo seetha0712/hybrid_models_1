@@ -1,0 +1,25 @@
+# python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+.artifacts/
+# node
+node_modules/
+apps/web/.next/
+apps/web/out/
+apps/web/src/data/*.json
+!apps/web/src/data/.gitkeep
+# env / secrets
+.env
+.env.*
+!.env.example
+# os
+.DS_Store
+
+# next
+apps/web/next-env.d.ts
+apps/web/tsconfig.tsbuildinfo

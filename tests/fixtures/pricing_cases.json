@@ -1,0 +1,15 @@
+{
+  "_comment": "Shared by tests/test_pricing.py (Python) and apps/web/src/lib/pricing.test.ts (TypeScript). Expected values are hand-computed from results/pricing.json.",
+  "claude": [
+    {"name": "haiku plain", "model": "claude-haiku-4-5", "usage": {"in": 1000, "cache_write": 0, "cache_read": 0, "out": 100}, "batch": false, "expected": 0.0015},
+    {"name": "haiku cached read", "model": "claude-haiku-4-5", "usage": {"in": 100, "cache_write": 0, "cache_read": 4200, "out": 10}, "batch": false, "expected": 0.00057},
+    {"name": "sonnet cache write", "model": "claude-sonnet-5", "usage": {"in": 0, "cache_write": 2000, "cache_read": 0, "out": 200}, "batch": false, "expected": 0.007},
+    {"name": "opus batch", "model": "claude-opus-5", "usage": {"in": 1000, "cache_write": 0, "cache_read": 0, "out": 200}, "batch": true, "expected": 0.005}
+  ],
+  "modal_cpu": [
+    {"name": "2 cores 4GiB 10s", "cores": 2, "gib": 4, "seconds": 10, "expected": 0.00035}
+  ],
+  "modal_gpu": [
+    {"name": "T4 one hour", "gpu": "T4", "seconds": 3600, "expected": 0.59}
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "_comment": "Single source of prices for spectrum/pricing.py and apps/web/src/lib/pricing.ts. USD. Claude list prices per 1M tokens (Anthropic first-party API). Modal rates are per-second-billed list rates; re-check modal.com/pricing before a demo.",
+  "as_of": "2026-09-04",
+  "claude": {
+    "claude-haiku-4-5": {"label": "Claude Haiku 4.5", "tier": "R2", "input": 1.0, "output": 5.0, "cache_write_mult": 1.25, "cache_read_mult": 0.10, "cache_min_tokens": 4096},
+    "claude-sonnet-5":  {"label": "Claude Sonnet 5",  "tier": "R1", "input": 2.0, "output": 10.0, "cache_write_mult": 1.25, "cache_read_mult": 0.10, "cache_min_tokens": 1024},
+    "claude-opus-5":    {"label": "Claude Opus 5",    "tier": "R1", "input": 5.0, "output": 25.0, "cache_write_mult": 1.25, "cache_read_mult": 0.10, "cache_min_tokens": 512}
+  },
+  "batch_discount": 0.5,
+  "modal": {
+    "cpu_per_core_hour": 0.047,
+    "mem_per_gib_hour": 0.008,
+    "gpu_per_hour": {"T4": 0.59, "L4": 0.80, "A10G": 1.10, "A100": 3.72}
+  },
+  "self_hosted_defaults": {
+    "_comment": "Used by the re-underwriting calculator only (monthly fixed cost of a warm pool, and variable $/task).",
+    "fixed_month_usd": 430.0,
+    "variable_per_task_usd": 0.000005
+  },
+  "tokens_per_task_default": 1000,
+  "frontier_deflation_per_year": 10
+}

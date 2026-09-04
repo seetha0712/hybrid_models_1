@@ -1,0 +1,142 @@
+{
+ "generated_at": "2026-09-04T07:48:57Z",
+ "status": "placeholder",
+ "note": "PLACEHOLDER: produced from the 200-row synthetic test fixture on a 4-core CPU container, not from the Hugging Face dataset. Replace by running the Phase 1 commands in the README, then `modal run spectrum/eval.py --phase 1`.",
+ "dataset": {
+  "dataset": "txn_fixture",
+  "hf_id": "(fixture)",
+  "n": 200,
+  "splits": {
+   "train": 160,
+   "test": 40
+  },
+  "n_labels": 12
+ },
+ "models": [
+  {
+   "id": "tiny",
+   "label": "Owned tiny model (from scratch)",
+   "tier": "R5",
+   "technique": "training from scratch (random init), supervised + aux LM loss",
+   "params": 1722368,
+   "accuracy": 0.85,
+   "macro_f1": 0.8447,
+   "accuracy_unseen": null,
+   "per_class": [
+    {
+     "c": "coffee",
+     "f1": 0.8
+    },
+    {
+     "c": "fees",
+     "f1": 1.0
+    },
+    {
+     "c": "fuel",
+     "f1": 0.8
+    },
+    {
+     "c": "groceries",
+     "f1": 1.0
+    },
+    {
+     "c": "healthcare",
+     "f1": 0.0
+    },
+    {
+     "c": "income",
+     "f1": 1.0
+    },
+    {
+     "c": "restaurants",
+     "f1": 0.5
+    },
+    {
+     "c": "shopping_online",
+     "f1": 0.8889
+    },
+    {
+     "c": "subscriptions",
+     "f1": 0.8
+    },
+    {
+     "c": "transfer",
+     "f1": 0.9333
+    },
+    {
+     "c": "transport",
+     "f1": 0.8
+    },
+    {
+     "c": "utilities",
+     "f1": 0.7692
+    }
+   ],
+   "latency_ms": {
+    "p50": 3.49,
+    "p95": 3.7
+   },
+   "cost_per_1m_usd": 0.139,
+   "throughput_per_s": 251.8,
+   "train_seconds": 24.4,
+   "train_device": "cpu"
+  },
+  {
+   "id": "lora",
+   "label": "Qwen3-0.6B + LoRA",
+   "tier": "R5",
+   "technique": "PEFT/LoRA supervised fine-tuning of a pretrained 0.6B base",
+   "params": 600000000,
+   "trainable_params": null,
+   "accuracy": null,
+   "macro_f1": null,
+   "accuracy_unseen": null,
+   "per_class": [],
+   "latency_ms": {
+    "p50": null
+   },
+   "cost_per_1m_usd": null,
+   "train_seconds": null,
+   "train_device": null
+  },
+  {
+   "id": "haiku",
+   "label": "Claude Haiku 4.5",
+   "tier": "R2",
+   "technique": "in-context learning (zero-shot + few-shot), no training",
+   "params": null,
+   "accuracy": null,
+   "macro_f1": null,
+   "accuracy_unseen": null,
+   "per_class": [],
+   "latency_ms": {
+    "p50": null,
+    "p95": null
+   },
+   "cost_per_1m_usd": null,
+   "cost_per_1m_batch_usd": null,
+   "n_eval": null,
+   "system_prompt_tokens": null
+  },
+  {
+   "id": "sonnet",
+   "label": "Claude Sonnet 5",
+   "tier": "R1",
+   "technique": "in-context learning (zero-shot + few-shot), no training",
+   "params": null,
+   "accuracy": null,
+   "macro_f1": null,
+   "accuracy_unseen": null,
+   "per_class": [],
+   "latency_ms": {
+    "p50": null,
+    "p95": null
+   },
+   "cost_per_1m_usd": null,
+   "cost_per_1m_batch_usd": null,
+   "n_eval": null,
+   "system_prompt_tokens": null
+  }
+ ],
+ "pricing_as_of": "2026-09-04"
+}

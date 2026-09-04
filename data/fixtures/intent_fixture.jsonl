@@ -1,0 +1,96 @@
+{"id": "ix0000", "text": "What category is 'DEBIT CARD PURCHASE ONE MEDICAL#3307 CHICAGO IL'?", "label": "txn_categorise", "split": "test", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0001", "text": "What category is 'POS WALGREENS CHICAGO IL'?", "label": "txn_categorise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0002", "text": "Tag: POS CON EDISON#2987 *X40583 SAN JOSE CA", "label": "txn_categorise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0003", "text": "Tag: TST* THAI HOUSE#3234 *D76547 SAN JOSE CA", "label": "txn_categorise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0004", "text": "Categorise this transaction: CHECKCARD 0412 WIRE FEE#1299 *P3", "label": "txn_categorise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0005", "text": "Categorise this transaction: SQ *APPLE.COM/BILL#3045 SAN JOSE CA", "label": "txn_categorise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0006", "text": "Tag: CHECKCARD 0412 ALDI *H16105 NEW YORK NY", "label": "txn_categorise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0007", "text": "What category is 'POS WALGREENS CHICAGO IL'?", "label": "txn_categorise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0008", "text": "Tag: PAYPAL *APPLE.COM/BILL#2018 NEW YORK NY", "label": "txn_categorise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0009", "text": "Tag: DEBIT CARD PURCHASE MONTHLY SERVICE FEE SAN JOSE CA", "label": "txn_categorise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0010", "text": "Categorise this transaction: POS SPOTIFY USA#9942 *A84289 CHICAGO IL", "label": "txn_categorise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0011", "text": "What category is 'SQ *PAYROLL ACME CORP SAN JOSE CA'?", "label": "txn_categorise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0012", "text": "Redact PII: My name is Ana Ruiz, card 4111 1111 1111 1111", "label": "pii_redact", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0013", "text": "Mask personal data in: call me on +1 415 555 0134", "label": "pii_redact", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0014", "text": "Redact PII: My name is Ana Ruiz, card 4111 1111 1111 1111", "label": "pii_redact", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0015", "text": "Mask personal data in: call me on +1 415 555 0134", "label": "pii_redact", "split": "test", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0016", "text": "Redact PII: My name is Ana Ruiz, card 4111 1111 1111 1111", "label": "pii_redact", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0017", "text": "Redact PII: My name is Ana Ruiz, card 4111 1111 1111 1111", "label": "pii_redact", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0018", "text": "Redact PII: My name is Ana Ruiz, card 4111 1111 1111 1111", "label": "pii_redact", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0019", "text": "Mask personal data in: call me on +1 415 555 0134", "label": "pii_redact", "split": "test", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0020", "text": "Mask personal data in: call me on +1 415 555 0134", "label": "pii_redact", "split": "test", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0021", "text": "Redact PII: My name is Ana Ruiz, card 4111 1111 1111 1111", "label": "pii_redact", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0022", "text": "Redact PII: My name is Ana Ruiz, card 4111 1111 1111 1111", "label": "pii_redact", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0023", "text": "Mask personal data in: call me on +1 415 555 0134", "label": "pii_redact", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0024", "text": "Is this an ISDA, CSA or term sheet? 'This Master Agreement dated...'", "label": "doc_classify", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0025", "text": "Classify document: 'Know Your Customer form for...'", "label": "doc_classify", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0026", "text": "Classify document: 'Know Your Customer form for...'", "label": "doc_classify", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0027", "text": "Is this an ISDA, CSA or term sheet? 'This Master Agreement dated...'", "label": "doc_classify", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0028", "text": "Classify document: 'Know Your Customer form for...'", "label": "doc_classify", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0029", "text": "Is this an ISDA, CSA or term sheet? 'This Master Agreement dated...'", "label": "doc_classify", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0030", "text": "Is this an ISDA, CSA or term sheet? 'This Master Agreement dated...'", "label": "doc_classify", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0031", "text": "Is this an ISDA, CSA or term sheet? 'This Master Agreement dated...'", "label": "doc_classify", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0032", "text": "Is this an ISDA, CSA or term sheet? 'This Master Agreement dated...'", "label": "doc_classify", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0033", "text": "Classify document: 'Know Your Customer form for...'", "label": "doc_classify", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0034", "text": "Classify document: 'Know Your Customer form for...'", "label": "doc_classify", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0035", "text": "Is this an ISDA, CSA or term sheet? 'This Master Agreement dated...'", "label": "doc_classify", "split": "test", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0036", "text": "Summarise this filing excerpt: The company reported revenue growth of 12% driven by services; operating margin compressed by 80bps due to input costs.", "label": "summarise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0037", "text": "Give me a 3-line summary of: The company reported revenue growth of 12% driven by services; operating margin compressed by 80bps due to input costs.", "label": "summarise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0038", "text": "Summarise this filing excerpt: The company reported revenue growth of 12% driven by services; operating margin compressed by 80bps due to input costs.", "label": "summarise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0039", "text": "Summarise this filing excerpt: The company reported revenue growth of 12% driven by services; operating margin compressed by 80bps due to input costs.", "label": "summarise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0040", "text": "Give me a 3-line summary of: The company reported revenue growth of 12% driven by services; operating margin compressed by 80bps due to input costs.", "label": "summarise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0041", "text": "Give me a 3-line summary of: The company reported revenue growth of 12% driven by services; operating margin compressed by 80bps due to input costs.", "label": "summarise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0042", "text": "Give me a 3-line summary of: The company reported revenue growth of 12% driven by services; operating margin compressed by 80bps due to input costs.", "label": "summarise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0043", "text": "Give me a 3-line summary of: The company reported revenue growth of 12% driven by services; operating margin compressed by 80bps due to input costs.", "label": "summarise", "split": "test", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0044", "text": "Summarise this filing excerpt: The company reported revenue growth of 12% driven by services; operating margin compressed by 80bps due to input costs.", "label": "summarise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0045", "text": "Summarise this filing excerpt: The company reported revenue growth of 12% driven by services; operating margin compressed by 80bps due to input costs.", "label": "summarise", "split": "test", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0046", "text": "Summarise this filing excerpt: The company reported revenue growth of 12% driven by services; operating margin compressed by 80bps due to input costs.", "label": "summarise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0047", "text": "Summarise this filing excerpt: The company reported revenue growth of 12% driven by services; operating margin compressed by 80bps due to input costs.", "label": "summarise", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0048", "text": "Write a short note to the client about the fee change", "label": "draft", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0049", "text": "Write a short note to the client about the fee change", "label": "draft", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0050", "text": "Write a short note to the client about the fee change", "label": "draft", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0051", "text": "Draft a polite email declining the meeting", "label": "draft", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0052", "text": "Draft a polite email declining the meeting", "label": "draft", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0053", "text": "Draft a polite email declining the meeting", "label": "draft", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0054", "text": "Write a short note to the client about the fee change", "label": "draft", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0055", "text": "Draft a polite email declining the meeting", "label": "draft", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0056", "text": "Draft a polite email declining the meeting", "label": "draft", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0057", "text": "Write a short note to the client about the fee change", "label": "draft", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0058", "text": "Draft a polite email declining the meeting", "label": "draft", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0059", "text": "Draft a polite email declining the meeting", "label": "draft", "split": "test", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0060", "text": "Analyse the credit memo and list the risks", "label": "complex_analysis", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0061", "text": "Compare the two hedging strategies and recommend one with reasoning", "label": "complex_analysis", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0062", "text": "Analyse the credit memo and list the risks", "label": "complex_analysis", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0063", "text": "Compare the two hedging strategies and recommend one with reasoning", "label": "complex_analysis", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0064", "text": "Analyse the credit memo and list the risks", "label": "complex_analysis", "split": "test", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0065", "text": "Compare the two hedging strategies and recommend one with reasoning", "label": "complex_analysis", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0066", "text": "Analyse the credit memo and list the risks", "label": "complex_analysis", "split": "test", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0067", "text": "Analyse the credit memo and list the risks", "label": "complex_analysis", "split": "test", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0068", "text": "Compare the two hedging strategies and recommend one with reasoning", "label": "complex_analysis", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0069", "text": "Analyse the credit memo and list the risks", "label": "complex_analysis", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0070", "text": "Compare the two hedging strategies and recommend one with reasoning", "label": "complex_analysis", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0071", "text": "Compare the two hedging strategies and recommend one with reasoning", "label": "complex_analysis", "split": "test", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0072", "text": "Fix this SQL: select * form trades", "label": "code", "split": "test", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0073", "text": "Fix this SQL: select * form trades", "label": "code", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0074", "text": "Write a Python function to parse ISO dates", "label": "code", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0075", "text": "Write a Python function to parse ISO dates", "label": "code", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0076", "text": "Fix this SQL: select * form trades", "label": "code", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0077", "text": "Write a Python function to parse ISO dates", "label": "code", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0078", "text": "Fix this SQL: select * form trades", "label": "code", "split": "test", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0079", "text": "Fix this SQL: select * form trades", "label": "code", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0080", "text": "Write a Python function to parse ISO dates", "label": "code", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0081", "text": "Fix this SQL: select * form trades", "label": "code", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0082", "text": "Write a Python function to parse ISO dates", "label": "code", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0083", "text": "Fix this SQL: select * form trades", "label": "code", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0084", "text": "I am still waiting on my card?", "label": "chat", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0085", "text": "Why was my transfer declined?", "label": "chat", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0086", "text": "I am still waiting on my card?", "label": "chat", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0087", "text": "I am still waiting on my card?", "label": "chat", "split": "test", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0088", "text": "How do I change my PIN?", "label": "chat", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0089", "text": "How do I change my PIN?", "label": "chat", "split": "test", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0090", "text": "How do I change my PIN?", "label": "chat", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0091", "text": "How do I change my PIN?", "label": "chat", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0092", "text": "Why was my transfer declined?", "label": "chat", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0093", "text": "I am still waiting on my card?", "label": "chat", "split": "test", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0094", "text": "I am still waiting on my card?", "label": "chat", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}
+{"id": "ix0095", "text": "How do I change my PIN?", "label": "chat", "split": "train", "group": null, "meta": {"synthetic_fixture": true}}

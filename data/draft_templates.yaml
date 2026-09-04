@@ -1,0 +1,13 @@
+# The ONLY templated router intent. "draft" requests have no public corpus; these are
+# generated from templates and flagged meta.templated=true in the corpus.
+templates:
+  - "Draft a short {tone} email to {who} about {topic}."
+  - "Write a {tone} note to {who} explaining {topic}."
+  - "Please draft a reply to {who} regarding {topic}, {tone} in tone."
+  - "Compose a brief message for {who}: {topic}."
+  - "Prepare a two-paragraph {tone} letter to {who} on {topic}."
+  - "Draft talking points for a call with {who} about {topic}."
+slots:
+  tone: [polite, formal, friendly, concise, apologetic, firm]
+  who: [a client, the relationship manager, the compliance team, our custodian, the branch manager, a prospective customer, the audit team, the vendor]
+  topic: [a fee change, a delayed transfer, the new KYC requirements, a missed meeting, the quarterly review, an account closure request, updated cut-off times, a document request, a rate change on the deposit product, onboarding next steps]
