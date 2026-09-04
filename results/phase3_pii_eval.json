@@ -1,47 +1,138 @@
 {
- "status": "placeholder",
- "note": "PLACEHOLDER: regex baseline measured on the 60-row synthetic fixture; model rows null until `modal run spectrum/pii/train_pii.py` has run on ai4privacy FinPII.",
  "base": "distilbert-base-multilingual-cased",
  "technique": "full supervised fine-tuning (token classification)",
- "n_params": null,
- "n_train": 0,
- "n_test": 60,
- "epochs": null,
- "train_seconds": null,
- "token_level_seqeval_f1": null,
+ "n_params": 134747153,
+ "n_train": 18000,
+ "n_test": 2000,
+ "epochs": 3,
+ "train_seconds": 165.2,
+ "token_level_seqeval_f1": 0.9679,
  "model_union_regex": {
-  "precision": null,
-  "recall": null,
-  "f1": null,
-  "n": 0,
-  "per_label": {}
- },
- "regex_only": {
-  "precision": 0.6667,
-  "recall": 0.5,
-  "f1": 0.5714,
-  "n": 60,
+  "precision": 0.9534,
+  "recall": 0.9728,
+  "f1": 0.963,
+  "n": 2000,
   "per_label": {
    "ACCT": {
     "f1": 0.0,
-    "support": 60
+    "support": 0
+   },
+   "ADDR": {
+    "f1": 0.9682,
+    "support": 1994
+   },
+   "CARD": {
+    "f1": 0.0,
+    "support": 0
+   },
+   "DOB": {
+    "f1": 0.0,
+    "support": 0
    },
    "EMAIL": {
-    "f1": 1.0,
-    "support": 60
+    "f1": 0.9723,
+    "support": 671
+   },
+   "OTHER": {
+    "f1": 0.9699,
+    "support": 7501
+   },
+   "PER": {
+    "f1": 0.9573,
+    "support": 2678
+   },
+   "PHONE": {
+    "f1": 0.0,
+    "support": 0
+   }
+  }
+ },
+ "regex_only": {
+  "precision": 0.2257,
+  "recall": 0.0496,
+  "f1": 0.0813,
+  "n": 2000,
+  "per_label": {
+   "ACCT": {
+    "f1": 0.0,
+    "support": 0
+   },
+   "ADDR": {
+    "f1": 0.0,
+    "support": 1994
+   },
+   "CARD": {
+    "f1": 0.0,
+    "support": 0
+   },
+   "DOB": {
+    "f1": 0.0,
+    "support": 0
+   },
+   "EMAIL": {
+    "f1": 0.9333,
+    "support": 671
+   },
+   "OTHER": {
+    "f1": 0.0,
+    "support": 7501
    },
    "PER": {
     "f1": 0.0,
-    "support": 60
+    "support": 2678
    },
    "PHONE": {
-    "f1": 0.6667,
-    "support": 60
+    "f1": 0.0,
+    "support": 0
    }
   }
  },
  "latency_ms": {
-  "p50": null,
-  "p95": null
+  "p50": 90.5,
+  "p95": 130.0
+ },
+ "seqeval_report": {
+  "ADDR": {
+   "precision": 0.9580260918888258,
+   "recall": 0.9779965257672264,
+   "f1-score": 0.9679083094555874,
+   "support": 1727
+  },
+  "EMAIL": {
+   "precision": 0.9637561779242174,
+   "recall": 0.9831932773109243,
+   "f1-score": 0.9733777038269551,
+   "support": 595
+  },
+  "OTHER": {
+   "precision": 0.9668074834037417,
+   "recall": 0.9763827517903397,
+   "f1-score": 0.971571526040482,
+   "support": 6563
+  },
+  "PER": {
+   "precision": 0.9490392648287385,
+   "recall": 0.9639372083156555,
+   "f1-score": 0.9564302252157442,
+   "support": 2357
+  },
+  "micro avg": {
+   "precision": 0.9615519662921348,
+   "recall": 0.9743817826009606,
+   "f1-score": 0.9679243615799239,
+   "support": 11242
+  },
+  "macro avg": {
+   "precision": 0.9594072545113809,
+   "recall": 0.9753774407960365,
+   "f1-score": 0.967321941134692,
+   "support": 11242
+  },
+  "weighted avg": {
+   "precision": 0.9615716996385879,
+   "recall": 0.9743817826009606,
+   "f1-score": 0.9679298479313316,
+   "support": 11242
+  }
  }
 }

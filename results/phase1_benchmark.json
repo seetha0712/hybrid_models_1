@@ -1,16 +1,43 @@
 {
- "generated_at": "2026-09-04T07:48:57Z",
- "status": "placeholder",
- "note": "PLACEHOLDER: produced from the 200-row synthetic test fixture on a 4-core CPU container, not from the Hugging Face dataset. Replace by running the Phase 1 commands in the README, then `modal run spectrum/eval.py --phase 1`.",
+ "generated_at": "2026-09-04T15:30:40Z",
+ "status": "measured",
  "dataset": {
-  "dataset": "txn_fixture",
-  "hf_id": "(fixture)",
-  "n": 200,
+  "dataset": "txn",
+  "path": "/vol/data/txn.jsonl",
+  "written": 68000,
+  "hf_id": "DoDataThings/us-bank-transaction-categories-v2",
   "splits": {
-   "train": 160,
-   "test": 40
+   "test": 6791,
+   "test_unseen": 11613,
+   "train": 49596
   },
-  "n_labels": 12
+  "text_column": "description",
+  "label_column": "category",
+  "columns": [
+   "description",
+   "category"
+  ],
+  "n": 68000,
+  "n_labels": 17,
+  "labels": [
+   "insurance",
+   "mortgage",
+   "entertainment",
+   "utilities",
+   "groceries",
+   "personal_care",
+   "shopping",
+   "subscription",
+   "healthcare",
+   "rent",
+   "fees",
+   "income",
+   "transportation",
+   "education",
+   "restaurants",
+   "transfer",
+   "travel"
+  ]
  },
  "models": [
   {
@@ -19,67 +46,87 @@
    "tier": "R5",
    "technique": "training from scratch (random init), supervised + aux LM loss",
    "params": 1722368,
-   "accuracy": 0.85,
-   "macro_f1": 0.8447,
-   "accuracy_unseen": null,
+   "accuracy": 0.9982,
+   "macro_f1": 0.9983,
+   "accuracy_unseen": 0.7632,
    "per_class": [
     {
-     "c": "coffee",
-     "f1": 0.8
+     "c": "education",
+     "f1": 0.9974
+    },
+    {
+     "c": "entertainment",
+     "f1": 1.0
     },
     {
      "c": "fees",
      "f1": 1.0
     },
     {
-     "c": "fuel",
-     "f1": 0.8
-    },
-    {
      "c": "groceries",
-     "f1": 1.0
+     "f1": 0.9962
     },
     {
      "c": "healthcare",
-     "f1": 0.0
+     "f1": 0.9952
     },
     {
      "c": "income",
      "f1": 1.0
     },
     {
+     "c": "insurance",
+     "f1": 1.0
+    },
+    {
+     "c": "mortgage",
+     "f1": 1.0
+    },
+    {
+     "c": "personal_care",
+     "f1": 0.9975
+    },
+    {
+     "c": "rent",
+     "f1": 1.0
+    },
+    {
      "c": "restaurants",
-     "f1": 0.5
+     "f1": 1.0
     },
     {
-     "c": "shopping_online",
-     "f1": 0.8889
+     "c": "shopping",
+     "f1": 0.9885
     },
     {
-     "c": "subscriptions",
-     "f1": 0.8
+     "c": "subscription",
+     "f1": 0.9975
     },
     {
      "c": "transfer",
-     "f1": 0.9333
+     "f1": 0.9988
     },
     {
-     "c": "transport",
-     "f1": 0.8
+     "c": "transportation",
+     "f1": 1.0
+    },
+    {
+     "c": "travel",
+     "f1": 1.0
     },
     {
      "c": "utilities",
-     "f1": 0.7692
+     "f1": 1.0
     }
    ],
    "latency_ms": {
-    "p50": 3.49,
-    "p95": 3.7
+    "p50": 4.95,
+    "p95": 5.61
    },
-   "cost_per_1m_usd": 0.139,
-   "throughput_per_s": 251.8,
-   "train_seconds": 24.4,
-   "train_device": "cpu"
+   "cost_per_1m_usd": 0.0753,
+   "throughput_per_s": 464.7,
+   "train_seconds": 107.0,
+   "train_device": "cuda"
   },
   {
    "id": "lora",
@@ -87,17 +134,87 @@
    "tier": "R5",
    "technique": "PEFT/LoRA supervised fine-tuning of a pretrained 0.6B base",
    "params": 600000000,
-   "trainable_params": null,
-   "accuracy": null,
-   "macro_f1": null,
-   "accuracy_unseen": null,
-   "per_class": [],
+   "trainable_params": 4587520,
+   "accuracy": 0.9679,
+   "macro_f1": 0.9692,
+   "accuracy_unseen": 0.8066,
+   "per_class": [
+    {
+     "c": "education",
+     "f1": 0.9953
+    },
+    {
+     "c": "entertainment",
+     "f1": 0.9393
+    },
+    {
+     "c": "fees",
+     "f1": 0.9985
+    },
+    {
+     "c": "groceries",
+     "f1": 0.8709
+    },
+    {
+     "c": "healthcare",
+     "f1": 0.9631
+    },
+    {
+     "c": "income",
+     "f1": 0.5914
+    },
+    {
+     "c": "insurance",
+     "f1": 0.9472
+    },
+    {
+     "c": "mortgage",
+     "f1": 0.8006
+    },
+    {
+     "c": "personal_care",
+     "f1": 0.9252
+    },
+    {
+     "c": "rent",
+     "f1": 1.0
+    },
+    {
+     "c": "restaurants",
+     "f1": 0.9097
+    },
+    {
+     "c": "shopping",
+     "f1": 0.6521
+    },
+    {
+     "c": "subscription",
+     "f1": 0.8866
+    },
+    {
+     "c": "transfer",
+     "f1": 0.5686
+    },
+    {
+     "c": "transportation",
+     "f1": 0.9253
+    },
+    {
+     "c": "travel",
+     "f1": 0.9722
+    },
+    {
+     "c": "utilities",
+     "f1": 0.9021
+    }
+   ],
    "latency_ms": {
-    "p50": null
+    "p50": 149.05
    },
-   "cost_per_1m_usd": null,
-   "train_seconds": null,
-   "train_device": null
+   "cost_per_1m_usd": 10.43,
+   "train_seconds": 279.5,
+   "train_device": "cuda",
+   "unparseable": 2
   },
   {
    "id": "haiku",
@@ -105,18 +222,89 @@
    "tier": "R2",
    "technique": "in-context learning (zero-shot + few-shot), no training",
    "params": null,
-   "accuracy": null,
-   "macro_f1": null,
-   "accuracy_unseen": null,
-   "per_class": [],
+   "accuracy": 0.9156,
+   "macro_f1": 0.9064,
+   "accuracy_unseen": 0.913,
+   "per_class": [
+    {
+     "c": "education",
+     "f1": 0.9752
+    },
+    {
+     "c": "entertainment",
+     "f1": 0.8991
+    },
+    {
+     "c": "fees",
+     "f1": 0.95
+    },
+    {
+     "c": "groceries",
+     "f1": 0.9748
+    },
+    {
+     "c": "healthcare",
+     "f1": 0.9735
+    },
+    {
+     "c": "income",
+     "f1": 0.6061
+    },
+    {
+     "c": "insurance",
+     "f1": 1.0
+    },
+    {
+     "c": "mortgage",
+     "f1": 0.9739
+    },
+    {
+     "c": "personal_care",
+     "f1": 0.906
+    },
+    {
+     "c": "rent",
+     "f1": 1.0
+    },
+    {
+     "c": "restaurants",
+     "f1": 0.9661
+    },
+    {
+     "c": "shopping",
+     "f1": 0.864
+    },
+    {
+     "c": "subscription",
+     "f1": 0.8667
+    },
+    {
+     "c": "transfer",
+     "f1": 0.75
+    },
+    {
+     "c": "transportation",
+     "f1": 0.887
+    },
+    {
+     "c": "travel",
+     "f1": 0.9464
+    },
+    {
+     "c": "utilities",
+     "f1": 0.9915
+    }
+   ],
    "latency_ms": {
-    "p50": null,
-    "p95": null
+    "p50": 817.2,
+    "p95": 923.8
    },
-   "cost_per_1m_usd": null,
-   "cost_per_1m_batch_usd": null,
-   "n_eval": null,
-   "system_prompt_tokens": null
+   "cost_per_1m_usd": 619.4,
+   "cost_per_1m_batch_usd": 622.02,
+   "n_eval": 1000,
+   "system_prompt_tokens": 5065,
+   "unparseable": 0,
+   "cache_read_tokens_after_first": 151786
   },
   {
    "id": "sonnet",
@@ -124,18 +312,179 @@
    "tier": "R1",
    "technique": "in-context learning (zero-shot + few-shot), no training",
    "params": null,
-   "accuracy": null,
-   "macro_f1": null,
-   "accuracy_unseen": null,
-   "per_class": [],
+   "accuracy": 0.9631,
+   "macro_f1": 0.9565,
+   "accuracy_unseen": 0.9291,
+   "per_class": [
+    {
+     "c": "education",
+     "f1": 0.9833
+    },
+    {
+     "c": "entertainment",
+     "f1": 0.9483
+    },
+    {
+     "c": "fees",
+     "f1": 0.9421
+    },
+    {
+     "c": "groceries",
+     "f1": 1.0
+    },
+    {
+     "c": "healthcare",
+     "f1": 1.0
+    },
+    {
+     "c": "income",
+     "f1": 0.6957
+    },
+    {
+     "c": "insurance",
+     "f1": 1.0
+    },
+    {
+     "c": "mortgage",
+     "f1": 0.9828
+    },
+    {
+     "c": "personal_care",
+     "f1": 0.9661
+    },
+    {
+     "c": "rent",
+     "f1": 1.0
+    },
+    {
+     "c": "restaurants",
+     "f1": 0.9915
+    },
+    {
+     "c": "shopping",
+     "f1": 0.9167
+    },
+    {
+     "c": "subscription",
+     "f1": 0.9123
+    },
+    {
+     "c": "transfer",
+     "f1": 0.7671
+    },
+    {
+     "c": "transportation",
+     "f1": 0.9402
+    },
+    {
+     "c": "travel",
+     "f1": 0.9558
+    },
+    {
+     "c": "utilities",
+     "f1": 1.0
+    }
+   ],
    "latency_ms": {
-    "p50": null,
-    "p95": null
+    "p50": 2244.2,
+    "p95": 2540.7
    },
-   "cost_per_1m_usd": null,
-   "cost_per_1m_batch_usd": null,
-   "n_eval": null,
-   "system_prompt_tokens": null
+   "cost_per_1m_usd": 1712.4,
+   "cost_per_1m_batch_usd": 1755.67,
+   "n_eval": 1000,
+   "system_prompt_tokens": 7236,
+   "unparseable": 0,
+   "cache_read_tokens_after_first": 216108
+  },
+  {
+   "id": "opus",
+   "label": "Claude Opus 5",
+   "tier": "R1",
+   "technique": "in-context learning (zero-shot + few-shot), no training",
+   "params": null,
+   "accuracy": 0.9826,
+   "macro_f1": 0.9839,
+   "accuracy_unseen": 0.9135,
+   "per_class": [
+    {
+     "c": "education",
+     "f1": 1.0
+    },
+    {
+     "c": "entertainment",
+     "f1": 0.9444
+    },
+    {
+     "c": "fees",
+     "f1": 0.9714
+    },
+    {
+     "c": "groceries",
+     "f1": 0.9697
+    },
+    {
+     "c": "healthcare",
+     "f1": 1.0
+    },
+    {
+     "c": "income",
+     "f1": 0.5
+    },
+    {
+     "c": "insurance",
+     "f1": 1.0
+    },
+    {
+     "c": "mortgage",
+     "f1": 1.0
+    },
+    {
+     "c": "personal_care",
+     "f1": 0.9697
+    },
+    {
+     "c": "rent",
+     "f1": 1.0
+    },
+    {
+     "c": "restaurants",
+     "f1": 0.9714
+    },
+    {
+     "c": "shopping",
+     "f1": 0.9143
+    },
+    {
+     "c": "subscription",
+     "f1": 0.9032
+    },
+    {
+     "c": "transfer",
+     "f1": 0.7391
+    },
+    {
+     "c": "transportation",
+     "f1": 1.0
+    },
+    {
+     "c": "travel",
+     "f1": 1.0
+    },
+    {
+     "c": "utilities",
+     "f1": 1.0
+    }
+   ],
+   "latency_ms": {
+    "p50": 1839.5,
+    "p95": 2724.6
+   },
+   "cost_per_1m_usd": 4386.0,
+   "cost_per_1m_batch_usd": 4581.8,
+   "n_eval": 300,
+   "system_prompt_tokens": 7236,
+   "unparseable": 0,
+   "cache_read_tokens_after_first": 216108
   }
  ],
  "pricing_as_of": "2026-09-04"
