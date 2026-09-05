@@ -522,8 +522,20 @@ export default function ResearchPage() {
         ))}
       </div>
       <p style={{ ...capNote, marginTop: "0.6rem" }}>
-        This site is served at <span className="mono">{SEETHA_URL}</span>. The live gateway API is served at <span className="mono">{GATEWAY}</span> and is protected by a demo key. The datasets are the public US-bank-transaction categories set, Banking77, the ai4privacy PII corpus, and the financial and code corpora listed in Table 2. The owned-model pattern follows the published JPMorgan &ldquo;Better with Less&rdquo; work, whose reported production figure was 0.24 dollars against 812 dollars on the same comparison.
+        This site is served at <span className="mono">{SEETHA_URL}</span>. The live gateway API is served at <span className="mono">{GATEWAY}</span> and is protected by a demo key. The datasets are the public US-bank-transaction categories set, Banking77, the ai4privacy PII corpus, and the financial and code corpora listed in Table 2.
       </p>
+
+      <H n="12" id="s12">Background and references</H>
+      <p style={p}>
+        The owned-model rung reproduces a published result from JPMorgan Chase. In <em>Better with Less</em>, the authors compared encoder-only, decoder-only and encoder-decoder architectures across three approaches, a pretrained large model, a fine-tuned large model, and a small model trained from scratch, on the task of financial transaction understanding. Large models such as LLaMA3-8b, Flan-T5 and SBERT did not meaningfully beat a small model built for the task, and the small model was faster and cheaper to run. In production their decoder-only proprietary model improved transaction coverage by 14 percent and saved more than 13 million dollars a year.
+      </p>
+      <p style={p}>
+        The inference drawn here is the one this experiment tests on public data: for a narrow, high-volume task a compact model trained from scratch can match or beat a frontier model at a fraction of the cost, and the residual advantage of the frontier model is narrow enough to handle by escalation rather than by paying frontier prices on every request. The cost-per-million figures on this site are measured directly, in Table 1, rather than taken from the paper.
+      </p>
+      <ul style={{ ...p, paddingLeft: "1.2rem" }}>
+        <li>Ding, W., Narendra, S., Shi, X., Ratnaparkhi, A., Yang, C., Sabzevar, N., Yin, Z. <em>Better with Less: Small Proprietary Models Surpass Large Language Models in Financial Transaction Understanding.</em> JPMorgan Chase, arXiv:2509.25803, 2025. <a href="https://arxiv.org/abs/2509.25803" target="_blank" rel="noreferrer" style={{ color: "var(--series-1)" }}>arxiv.org/abs/2509.25803</a></li>
+        <li>Datasets: DoDataThings/us-bank-transaction-categories-v2; legacy-datasets/banking77; ai4privacy/pii-masking-300k; virattt/financial-qa-10K; kritsadaK/EDGAR-CORPUS-Financial-Summarization; code-search-net/code_search_net.</li>
+      </ul>
     </article>
   );
 }

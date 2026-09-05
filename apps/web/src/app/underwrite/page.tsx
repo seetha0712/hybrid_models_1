@@ -98,7 +98,11 @@ function ScenarioTab() {
   const [gpuType, setGpuType] = useState("L4");
   const [gpus, setGpus] = useState(1);
   const [hoursMo, setHoursMo] = useState(730);
-  const [mlops, setMlops] = useState(300);
+  const [mlops, setMlops] = useState(15000);
+  const [evalGov, setEvalGov] = useState(5000);
+  const [fleet, setFleet] = useState(20);
+  const [retrainsYr, setRetrainsYr] = useState(4);
+  const [costPerRetrain, setCostPerRetrain] = useState(600);
 
   const m = useMemo(() => {
     const tasksDay = users * perDay;
@@ -111,13 +115,16 @@ function ScenarioTab() {
     const perCall = (id: string) => (inSet / 1e6) * PRICING.claude[id].input + (outSet / 1e6) * PRICING.claude[id].output;
     const perExtraction = (id: string) => effCalls * perCall(id);
     const computeMo = gpus * (PRICING.modal.gpu_per_hour[gpuType] ?? 0) * hoursMo;
-    const fixedMo = computeMo + mlops;
+    const sharedFullMo = computeMo + mlops + evalGov;              // full in-house platform, all models
+    const perModelSharedMo = sharedFullMo / Math.max(fleet, 1);    // apportioned to one workload
+    const retrainMo = (retrainsYr * costPerRetrain) / 12;          // per model, not shared
+    const fixedMo = perModelSharedMo + retrainMo;                  // this workload, monthly
     const selfYear = fixedMo * 12;
     const front = FRONTIER.map((t) => ({ ...t, per: perExtraction(t.id), perCall: perCall(t.id), year: tasksYear * perExtraction(t.id), inP: PRICING.claude[t.id].input, outP: PRICING.claude[t.id].output }));
     const cheapest = front.reduce((a, b) => (b.year < a.year ? b : a));
     const callsCross = cheapest.perCall > 0 ? selfYear / cheapest.perCall : null; // crossover in API calls / year (self is flat)
-    return { tasksDay, tasksYear, effCalls, callsDay, callsYear, inTokensYear, outTokensYear, computeMo, fixedMo, selfYear, front, cheapest, callsCross };
-  }, [users, perDay, days, promptSets, inSet, outSet, reexec, gpus, gpuType, hoursMo, mlops]);
+    return { tasksDay, tasksYear, effCalls, callsDay, callsYear, inTokensYear, outTokensYear, computeMo, sharedFullMo, perModelSharedMo, retrainMo, fixedMo, selfYear, front, cheapest, callsCross };
+  }, [users, perDay, days, promptSets, inSet, outSet, reexec, gpus, gpuType, hoursMo, mlops, evalGov, fleet, retrainsYr, costPerRetrain]);
 
   const options = [...m.front.map((t) => ({ k: t.key, v: t.year, c: t.c })), { k: "Self-hosted SLM", v: m.selfYear, c: "var(--series-1)" }];
   const maxCost = Math.max(...options.map((o) => o.v), 1);
@@ -153,15 +160,27 @@ function ScenarioTab() {
           <Num label="Input tokens per prompt set" v={inSet} set={setInSet} step={50} hint="instruction + retrieved context; the ~1 page you described (about 800 tokens)" />
           <Num label="Output tokens per prompt set" v={outSet} set={setOutSet} step={50} hint="assumption: compact extracted fields per call, ~150 words; raise it if the model returns full clause text" />
           <Num label="Re-execution rate (%)" v={reexec} set={setReexec} hint="share of calls retried in a day; multiplies calls and tokens" />
-          <div className="text-sm font-semibold mt-2">Self-hosted assumption</div>
-          <label className="text-sm block"><div className="flex justify-between"><span>GPU type</span><span className="mono">{fmtUsd(PRICING.modal.gpu_per_hour[gpuType] ?? 0, 2)}/hr</span></div>
-            <select value={gpuType} onChange={(e) => setGpuType(e.target.value)} className="w-full mono" style={{ padding: "5px 8px", border: "1px solid var(--border)", borderRadius: 6, background: "var(--surface-1)" }}>
-              {gpuTypes.map((g) => <option key={g} value={g}>{g}</option>)}
-            </select>
-          </label>
-          <Num label="Warm GPUs (kept always on)" v={gpus} set={setGpus} hint="a warm pool billed whether busy or not" />
-          <Num label="Warm hours per month" v={hoursMo} set={setHoursMo} step={10} hint="730 = 24h × ~30.4 days, i.e. always on; lower for business hours or scale-to-zero" />
-          <Num label="MLOps + monitoring $/month" v={mlops} set={setMlops} step={50} hint="share of an engineer, logging, evals" />
+          <div style={{ marginTop: "0.6rem", border: "1px solid var(--series-1)", borderRadius: 8, padding: "0.6rem", background: "color-mix(in oklab, var(--series-1) 6%, var(--surface-1))" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.3rem", flexWrap: "wrap" }}>
+              <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#fff", background: "var(--series-1)", borderRadius: 4, padding: "1px 6px", letterSpacing: "0.03em" }}>IN-HOUSE ONLY</span>
+              <span className="text-sm font-semibold">Self-hosted cost (SLM or open weights)</span>
+            </div>
+            <p className="muted" style={{ fontSize: "0.7rem", marginBottom: "0.5rem" }}>These lines apply only when models run in-house. Compute and platform are shared across the fleet, so each workload carries a fraction; the rented API tiers incur none of them.</p>
+            <div className="space-y-2">
+              <label className="text-sm block"><div className="flex justify-between"><span>GPU type</span><span className="mono">{fmtUsd(PRICING.modal.gpu_per_hour[gpuType] ?? 0, 2)}/hr</span></div>
+                <select value={gpuType} onChange={(e) => setGpuType(e.target.value)} className="w-full mono" style={{ padding: "5px 8px", border: "1px solid var(--border)", borderRadius: 6, background: "var(--surface-1)" }}>
+                  {gpuTypes.map((g) => <option key={g} value={g}>{g}</option>)}
+                </select>
+              </label>
+              <Num label="Warm GPUs (shared base pool)" v={gpus} set={setGpus} hint="a warm pool serving the fleet via swappable adapters, billed whether busy or not" />
+              <Num label="Warm hours per month" v={hoursMo} set={setHoursMo} step={10} hint="730 = 24h × ~30.4 days (always on); lower for business hours or scale-to-zero" />
+              <Num label="MLOps + platform $/month (whole team)" v={mlops} set={setMlops} step={500} hint="engineers, pipelines, serving, on-call; a fixed cost shared across the fleet" />
+              <Num label="Evaluation + governance $/month (whole team)" v={evalGov} set={setEvalGov} step={250} hint="gold sets, human review, model cards, audit; shared across the fleet" />
+              <Num label="Models sharing the platform (fleet size)" v={fleet} set={setFleet} min={1} hint="compute and platform are divided by this; a bigger fleet lowers each model's local share" />
+              <Num label="Retrains per year (this model)" v={retrainsYr} set={setRetrainsYr} hint="drift maintenance; small models are cheap and fast to refresh" />
+              <Num label="Cost per retrain (labeling + compute) $" v={costPerRetrain} set={setCostPerRetrain} step={50} hint="charged to this model, not shared" />
+            </div>
+          </div>
         </div>
 
         <div className="md:col-span-2 space-y-4">
@@ -221,18 +240,26 @@ function ScenarioTab() {
           </Section>
 
           <Section title="Self-hosted cost, broken down">
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem", marginBottom: "0.4rem" }}>
+              <span style={{ fontSize: "0.6rem", fontWeight: 800, color: "#fff", background: "var(--series-1)", borderRadius: 4, padding: "1px 6px", letterSpacing: "0.03em" }}>IN-HOUSE ONLY</span>
+              <span className="muted text-xs">applies to a self-hosted SLM or open weights, not to the rented API tiers</span>
+            </div>
             <div className="overflow-x-auto">
               <table className="data text-sm" style={{ width: "100%" }}>
                 <tbody>
-                  <tr><td>GPU compute (warm pool)</td><td className="mono">{gpus} × {gpuType} × {fmtUsd(PRICING.modal.gpu_per_hour[gpuType] ?? 0, 2)}/hr × {fmtNum(hoursMo)} hr</td><td className="mono" style={{ textAlign: "right" }}>{fmtUsd(m.computeMo, 0)} / mo</td></tr>
-                  <tr><td>MLOps + monitoring</td><td className="mono">fixed</td><td className="mono" style={{ textAlign: "right" }}>{fmtUsd(mlops, 0)} / mo</td></tr>
-                  <tr style={{ fontWeight: 700 }}><td>Total fixed</td><td className="mono">= compute + MLOps</td><td className="mono" style={{ textAlign: "right" }}>{fmtUsd(m.fixedMo, 0)} / mo</td></tr>
+                  <tr><td>GPU compute (warm pool, shared)</td><td className="mono">{gpus} × {gpuType} × {fmtUsd(PRICING.modal.gpu_per_hour[gpuType] ?? 0, 2)}/hr × {fmtNum(hoursMo)} hr</td><td className="mono" style={{ textAlign: "right" }}>{fmtUsd(m.computeMo, 0)} / mo</td></tr>
+                  <tr><td>MLOps + platform (shared)</td><td className="mono">whole team</td><td className="mono" style={{ textAlign: "right" }}>{fmtUsd(mlops, 0)} / mo</td></tr>
+                  <tr><td>Evaluation + governance (shared)</td><td className="mono">whole team</td><td className="mono" style={{ textAlign: "right" }}>{fmtUsd(evalGov, 0)} / mo</td></tr>
+                  <tr style={{ fontWeight: 700 }}><td>Full platform (all models)</td><td className="mono">compute + MLOps + eval</td><td className="mono" style={{ textAlign: "right" }}>{fmtUsd(m.sharedFullMo, 0)} / mo</td></tr>
+                  <tr style={{ color: "var(--series-1)", fontWeight: 700 }}><td>Apportioned to this workload</td><td className="mono">÷ {fmtNum(fleet)} models in the fleet</td><td className="mono" style={{ textAlign: "right" }}>{fmtUsd(m.perModelSharedMo, 0)} / mo</td></tr>
+                  <tr><td>Retraining (this model)</td><td className="mono">{fmtNum(retrainsYr)} × {fmtUsd(costPerRetrain, 0)} ÷ 12</td><td className="mono" style={{ textAlign: "right" }}>{fmtUsd(m.retrainMo, 0)} / mo</td></tr>
+                  <tr style={{ fontWeight: 700 }}><td>This workload total</td><td className="mono">share + retraining</td><td className="mono" style={{ textAlign: "right" }}>{fmtUsd(m.fixedMo, 0)} / mo</td></tr>
                   <tr style={{ fontWeight: 700 }}><td>Annual</td><td className="mono">× 12</td><td className="mono" style={{ textAlign: "right" }}>{fmtUsd(m.selfYear, 0)} / yr</td></tr>
                 </tbody>
               </table>
             </div>
             <p className="muted text-xs mt-2">
-              Assumption: a fine-tuned small model kept warm on the chosen GPU pool, billed whether or not it is busy, plus a fixed share of an engineer for MLOps and monitoring. Marginal inference within the pool capacity is treated as near zero, so the annual figure does not change with volume until the pool needs more GPUs. A serverless, scale-to-zero deployment would instead drop the fixed pool and pay per GPU-second; the project gateway itself runs scale-to-zero for that reason. Set warm GPUs to a lower number of hours to approximate that.
+              These costs exist only for in-house hosting, a fine-tuned SLM or open weights. The GPU pool, the MLOps and platform team, and the evaluation and governance function are largely fixed and shared, so as the fleet grows each model carries a smaller share: the same platform is divided by {fmtNum(fleet)} models here, and the local run cost falls as that number rises. Retraining is charged to this model as drift maintenance. Marginal inference within pool capacity is treated as near zero, so the figure is flat with volume until the pool needs more GPUs. A serverless scale-to-zero deployment trades the warm pool for a per-GPU-second charge; the project gateway runs scale-to-zero for that reason.
             </p>
           </Section>
 
