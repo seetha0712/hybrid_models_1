@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import { CartesianGrid, Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { CartesianGrid, Legend, Line, LineChart, ReferenceDot, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Section, StatTile, Tip } from "@/components/ui";
 import { fmtNum, fmtUsd, PRICING, reunderwrite } from "@/lib/pricing";
 
@@ -103,6 +103,18 @@ function ScenarioTab() {
     return { tasksDay, tasksYear, effCalls, callsDay, callsYear, tokensPerTask, tokensYear, flagYear, smallYear, selfYear };
   }, [users, perDay, days, promptSets, tokPerSet, reexec, flag, small, fixedMo, varTask]);
 
+  const cv = useMemo(() => {
+    const pts = Array.from({ length: 41 }, (_, i) => {
+      const V = Math.pow(10, 3 + i * (5 / 40)); // 1e3 .. 1e8 extractions / year
+      const toky = V * m.tokensPerTask;
+      return { V, flagship: (toky / 1e6) * flag, small_tier: (toky / 1e6) * small, self_hosted: fixedMo * 12 + V * (varTask / 1e6) };
+    });
+    const denom = m.tokensPerTask * small - varTask; // self == small tier
+    const vcross = denom > 0 ? (fixedMo * 12 * 1e6) / denom : null;
+    const ycross = vcross != null ? fixedMo * 12 + vcross * (varTask / 1e6) : null;
+    return { pts, vcross, ycross };
+  }, [m.tokensPerTask, flag, small, fixedMo, varTask]);
+
   const options = [
     { k: "Flagship API", v: m.flagYear, c: "var(--series-2)" },
     { k: "Small tier API", v: m.smallYear, c: "var(--series-3)" },
@@ -191,6 +203,21 @@ function ScenarioTab() {
             <p className="muted text-xs mt-2">
               With these defaults the small-tier API is the cheapest, because {fmtNum(m.tasksYear)} extractions a year is a modest volume next to the fixed cost of owning a model. Self-hosting overtakes it only at higher volume or larger per-task token counts; raise the users, the contracts per day, or the tokens per prompt set to see the crossover. The self-hosted line is a cost view only and does not claim a small owned model matches frontier quality on complex legal extraction.
             </p>
+          </Section>
+
+          <Section title="Annual cost vs volume, with the crossover">
+            <div style={{ height: 300 }}><ResponsiveContainer><LineChart data={cv.pts} margin={{ left: 10, right: 20 }}>
+              <CartesianGrid /><XAxis dataKey="V" scale="log" domain={["auto", "auto"]} type="number" tickFormatter={(v) => fmtNum(v)} /><YAxis scale="log" domain={["auto", "auto"]} tickFormatter={(v) => fmtUsd(v, 0)} width={80} />
+              <Tooltip content={<Tip fmt={(v) => fmtUsd(v, 0)} />} labelFormatter={(v) => `${fmtNum(v)} extractions / year`} /><Legend />
+              <Line type="monotone" dataKey="flagship" name="flagship API" stroke="var(--series-2)" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="small_tier" name="small tier API" stroke="var(--series-3)" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="self_hosted" name="self-hosted SLM" stroke="var(--series-1)" dot={false} strokeWidth={2} />
+              <ReferenceLine x={m.tasksYear} stroke="var(--text-muted)" strokeDasharray="4 4" label={{ value: "you", fill: "var(--text-secondary)", fontSize: 11 }} />
+              {cv.vcross != null && <ReferenceDot x={cv.vcross} y={cv.ycross as number} r={5} fill="var(--series-1)" stroke="var(--surface-1)" strokeWidth={2} label={{ value: "crossover", position: "top", fill: "var(--text-secondary)", fontSize: 11 }} />}
+            </LineChart></ResponsiveContainer></div>
+            <p className="muted text-xs mt-2">{cv.vcross != null
+              ? `Self-hosting overtakes the small tier at about ${fmtNum(Math.round(cv.vcross))} extractions / year. The dashed line marks the current ${fmtNum(m.tasksYear)} / year, which sits ${m.tasksYear < cv.vcross ? "below" : "above"} the crossover, so ${m.tasksYear < cv.vcross ? "renting the small tier wins today" : "owning wins today"}.`
+              : "At these prices self-hosting never beats the small tier, so renting wins at every volume."}</p>
           </Section>
         </div>
       </div>
