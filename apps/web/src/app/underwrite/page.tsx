@@ -48,7 +48,7 @@ function CrossoverTab() {
           <Slider label="Small tier blended $/M tokens (today)" v={small} set={setSmall} min={0.2} max={10} step={0.1} fmt={(n) => fmtUsd(n, 1)} />
           <Slider label="Self-hosted fixed $/month (warm pool + MLOps)" v={fixed} set={setFixed} min={0} max={5000} step={10} fmt={(n) => fmtUsd(n, 0)} />
           <Slider label="Self-hosted variable $/M tasks" v={variable} set={setVariable} min={0} max={50} step={0.5} fmt={(n) => fmtUsd(n, 1)} />
-          <Slider label="Your volume (log10 tasks / month)" v={volume} set={setVolume} min={3} max={9} step={0.1} fmt={(n) => fmtNum(Math.pow(10, n))} />
+          <Slider label="Our volume (log10 tasks / month)" v={volume} set={setVolume} min={3} max={9} step={0.1} fmt={(n) => fmtNum(Math.pow(10, n))} />
         </div>
         <div className="md:col-span-2">
           <div className="grid grid-cols-3 gap-3">
@@ -63,7 +63,7 @@ function CrossoverTab() {
               <Line type="monotone" dataKey="flagship" name="flagship API" stroke="var(--series-2)" dot={false} strokeWidth={2} />
               <Line type="monotone" dataKey="small_tier" name="small tier API" stroke="var(--series-3)" dot={false} strokeWidth={2} />
               <Line type="monotone" dataKey="self_hosted" name="self-hosted SLM" stroke="var(--series-1)" dot={false} strokeWidth={2} />
-              <ReferenceLine x={Math.pow(10, volume)} stroke="var(--text-muted)" strokeDasharray="4 4" label={{ value: "you", fill: "var(--text-secondary)", fontSize: 11 }} />
+              <ReferenceLine x={Math.pow(10, volume)} stroke="var(--text-muted)" strokeDasharray="4 4" label={{ value: "our data point", fill: "var(--text-secondary)", fontSize: 11 }} />
             </LineChart></ResponsiveContainer></div>
           </Section>
         </div>
@@ -237,7 +237,7 @@ function ScenarioTab() {
               <Tooltip content={<Tip fmt={(v) => fmtUsd(v, 0)} />} labelFormatter={(v) => `${fmtNum(v)} API calls / year`} /><Legend />
               {m.front.map((t) => <Line key={t.id} type="monotone" dataKey={t.id} name={t.key} stroke={t.c} dot={false} strokeWidth={2} />)}
               <Line type="monotone" dataKey="self_hosted" name="self-hosted SLM" stroke="var(--series-1)" dot={false} strokeWidth={2} strokeDasharray="5 3" />
-              <ReferenceLine x={m.callsYear} stroke="var(--text-muted)" strokeDasharray="4 4" label={{ value: "you", fill: "var(--text-secondary)", fontSize: 11 }} />
+              <ReferenceLine x={m.callsYear} stroke="var(--text-muted)" strokeDasharray="4 4" label={{ value: "our data point", fill: "var(--text-secondary)", fontSize: 11 }} />
               {m.callsCross != null && <ReferenceDot x={m.callsCross} y={m.selfYear} r={5} fill="var(--series-1)" stroke="var(--surface-1)" strokeWidth={2} label={{ value: "crossover", position: "top", fill: "var(--text-secondary)", fontSize: 11 }} />}
             </LineChart></ResponsiveContainer></div>
             <p className="muted text-xs mt-2">{m.callsCross != null
