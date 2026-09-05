@@ -27,6 +27,7 @@ function CrossoverTab() {
   const [volume, setVolume] = useState(6);
   const data = useMemo(() => Array.from({ length: 41 }, (_, i) => { const v = Math.pow(10, 3 + i * 0.15); const r = reunderwrite({ monthlyVolume: v, tokensPerTask: tokens, flagshipPerMtok: flag, smallPerMtok: small, selfFixedMonth: fixed, selfVariablePerTask: variable / 1e6, yearsAhead: years }); return { v, ...r }; }), [tokens, flag, small, fixed, variable, years]);
   const at = reunderwrite({ monthlyVolume: Math.pow(10, volume), tokensPerTask: tokens, flagshipPerMtok: flag, smallPerMtok: small, selfFixedMonth: fixed, selfVariablePerTask: variable / 1e6, yearsAhead: years });
+  const opx = Math.pow(10, volume);
   return (
     <div>
       <details className="card mt-3" style={{ padding: "0.8rem 1rem" }}>
@@ -63,8 +64,12 @@ function CrossoverTab() {
               <Line type="monotone" dataKey="flagship" name="flagship API" stroke="var(--series-2)" dot={false} strokeWidth={2} />
               <Line type="monotone" dataKey="small_tier" name="small tier API" stroke="var(--series-3)" dot={false} strokeWidth={2} />
               <Line type="monotone" dataKey="self_hosted" name="self-hosted SLM" stroke="var(--series-1)" dot={false} strokeWidth={2} />
-              <ReferenceLine x={Math.pow(10, volume)} stroke="var(--text-muted)" strokeDasharray="4 4" label={{ value: "our data point", fill: "var(--text-secondary)", fontSize: 11 }} />
+              <ReferenceLine x={opx} stroke="var(--text-muted)" strokeDasharray="4 4" />
+              <ReferenceDot x={opx} y={at.flagship} r={5} fill="var(--series-2)" stroke="var(--surface-1)" strokeWidth={1.5} />
+              <ReferenceDot x={opx} y={at.small_tier} r={5} fill="var(--series-3)" stroke="var(--surface-1)" strokeWidth={1.5} />
+              <ReferenceDot x={opx} y={at.self_hosted} r={5} fill="var(--series-1)" stroke="var(--surface-1)" strokeWidth={1.5} />
             </LineChart></ResponsiveContainer></div>
+            <p className="muted text-xs mt-2"><span style={{ display: "inline-block", width: 9, height: 9, borderRadius: "50%", background: "var(--text-secondary)", marginRight: 5, verticalAlign: "middle" }} />The filled dots sit on the dashed line at our current volume ({fmtNum(opx)} tasks / month); each is coloured to its line, so read across to compare the three monthly costs at that volume.</p>
           </Section>
         </div>
       </div>
@@ -237,12 +242,16 @@ function ScenarioTab() {
               <Tooltip content={<Tip fmt={(v) => fmtUsd(v, 0)} />} labelFormatter={(v) => `${fmtNum(v)} API calls / year`} /><Legend />
               {m.front.map((t) => <Line key={t.id} type="monotone" dataKey={t.id} name={t.key} stroke={t.c} dot={false} strokeWidth={2} />)}
               <Line type="monotone" dataKey="self_hosted" name="self-hosted SLM" stroke="var(--series-1)" dot={false} strokeWidth={2} strokeDasharray="5 3" />
-              <ReferenceLine x={m.callsYear} stroke="var(--text-muted)" strokeDasharray="4 4" label={{ value: "our data point", fill: "var(--text-secondary)", fontSize: 11 }} />
-              {m.callsCross != null && <ReferenceDot x={m.callsCross} y={m.selfYear} r={5} fill="var(--series-1)" stroke="var(--surface-1)" strokeWidth={2} label={{ value: "crossover", position: "top", fill: "var(--text-secondary)", fontSize: 11 }} />}
+              <ReferenceLine x={m.callsYear} stroke="var(--text-muted)" strokeDasharray="4 4" />
+              {m.front.map((t) => <ReferenceDot key={"d" + t.id} x={m.callsYear} y={t.year} r={5} fill={t.c} stroke="var(--surface-1)" strokeWidth={1.5} />)}
+              <ReferenceDot x={m.callsYear} y={m.selfYear} r={5} fill="var(--series-1)" stroke="var(--surface-1)" strokeWidth={1.5} />
+              {m.callsCross != null && <ReferenceDot x={m.callsCross} y={m.selfYear} r={7} fill="none" stroke="var(--series-1)" strokeWidth={2.5} />}
             </LineChart></ResponsiveContainer></div>
-            <p className="muted text-xs mt-2">{m.callsCross != null
-              ? `The horizontal axis is API calls per year, which is what drives token spend. The self-hosted line is flat because a warm pool costs the same regardless of load, until it runs out of capacity. It overtakes the cheapest frontier tier (${m.cheapest.key}) at about ${fmtNum(Math.round(m.callsCross))} API calls / year. The dashed line marks the current ${fmtNum(Math.round(m.callsYear))} API calls / year (${fmtNum(m.tasksYear)} extractions × ${m.effCalls.toFixed(1)} calls each), which sits ${m.callsYear < m.callsCross ? "below the crossover, so renting wins today" : "above the crossover, so owning wins today"}.`
-              : "At these settings the frontier tier is always cheaper."}</p>
+            <p className="muted text-xs mt-2">
+              <span style={{ display: "inline-block", width: 9, height: 9, borderRadius: "50%", background: "var(--text-secondary)", marginRight: 5, verticalAlign: "middle" }} />
+              Filled dots sit on the dashed line at our current volume ({fmtNum(Math.round(m.callsYear))} API calls / year, which is {fmtNum(m.tasksYear)} extractions × {m.effCalls.toFixed(1)} calls each), each coloured to its line.
+              {m.callsCross != null ? <>{" "}<span style={{ display: "inline-block", width: 10, height: 10, borderRadius: "50%", border: "2px solid var(--series-1)", marginLeft: 4, marginRight: 5, verticalAlign: "middle" }} />The open ring is the crossover, where self-hosting overtakes the cheapest tier ({m.cheapest.key}) at about {fmtNum(Math.round(m.callsCross))} API calls / year. Our volume sits {m.callsYear < m.callsCross ? "left of it, so renting wins today" : "right of it, so owning wins today"}.</> : " At these settings the frontier tier is always cheaper."}
+            </p>
           </Section>
         </div>
       </div>
