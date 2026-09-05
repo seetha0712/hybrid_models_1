@@ -81,7 +81,10 @@ class Tiers:
         else:
             sys_prompt = INTENT_SYSTEM_PROMPTS.get(intent, INTENT_SYSTEM_PROMPTS["chat"])
             effort = "low" if tier == "R1_OPUS" else None
-            res = call_claude(self.claude, model=model, system=system_blocks(sys_prompt), user=text, schema=ROUTER_ANSWER_SCHEMA, max_tokens=1024, effort=effort)
+            # Reasoning tiers spend output tokens on internal thinking before the answer, so the budget
+            # must cover both. Opus (adaptive thinking on) needs the most; 1024 truncates it to nothing.
+            max_tokens = 8192 if tier == "R1_OPUS" else 2048
+            res = call_claude(self.claude, model=model, system=system_blocks(sys_prompt), user=text, schema=ROUTER_ANSWER_SCHEMA, max_tokens=max_tokens, effort=effort)
             answer = (res.json or {}).get("answer", res.text)
             conf = (res.json or {}).get("confidence")
         hop = res.hop(tier)
