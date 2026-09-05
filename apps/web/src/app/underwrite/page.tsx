@@ -103,14 +103,15 @@ function ScenarioTab() {
     const callsYear = tasksYear * effCalls;
     const inTokensYear = callsYear * inSet;
     const outTokensYear = callsYear * outSet;
-    const perExtraction = (id: string) => effCalls * ((inSet / 1e6) * PRICING.claude[id].input + (outSet / 1e6) * PRICING.claude[id].output);
+    const perCall = (id: string) => (inSet / 1e6) * PRICING.claude[id].input + (outSet / 1e6) * PRICING.claude[id].output;
+    const perExtraction = (id: string) => effCalls * perCall(id);
     const computeMo = gpus * (PRICING.modal.gpu_per_hour[gpuType] ?? 0) * hoursMo;
     const fixedMo = computeMo + mlops;
     const selfYear = fixedMo * 12;
-    const front = FRONTIER.map((t) => ({ ...t, per: perExtraction(t.id), year: tasksYear * perExtraction(t.id), inP: PRICING.claude[t.id].input, outP: PRICING.claude[t.id].output }));
+    const front = FRONTIER.map((t) => ({ ...t, per: perExtraction(t.id), perCall: perCall(t.id), year: tasksYear * perExtraction(t.id), inP: PRICING.claude[t.id].input, outP: PRICING.claude[t.id].output }));
     const cheapest = front.reduce((a, b) => (b.year < a.year ? b : a));
-    const vcross = cheapest.per > 0 ? selfYear / cheapest.per : null; // self is flat; frontier rises with volume
-    return { tasksDay, tasksYear, effCalls, callsDay, callsYear, inTokensYear, outTokensYear, computeMo, fixedMo, selfYear, front, cheapest, vcross };
+    const callsCross = cheapest.perCall > 0 ? selfYear / cheapest.perCall : null; // crossover in API calls / year (self is flat)
+    return { tasksDay, tasksYear, effCalls, callsDay, callsYear, inTokensYear, outTokensYear, computeMo, fixedMo, selfYear, front, cheapest, callsCross };
   }, [users, perDay, days, promptSets, inSet, outSet, reexec, gpus, gpuType, hoursMo, mlops]);
 
   const options = [...m.front.map((t) => ({ k: t.key, v: t.year, c: t.c })), { k: "Self-hosted SLM", v: m.selfYear, c: "var(--series-1)" }];
@@ -118,9 +119,9 @@ function ScenarioTab() {
   const cheapestOpt = options.reduce((a, b) => (b.v < a.v ? b : a));
 
   const chart = useMemo(() => Array.from({ length: 41 }, (_, i) => {
-    const V = Math.pow(10, 3 + i * (5 / 40));
-    const row: Record<string, number> = { V, self_hosted: m.selfYear };
-    m.front.forEach((t) => { row[t.id] = V * t.per; });
+    const calls = Math.pow(10, 4 + i * (5 / 40)); // 1e4 .. 1e9 API calls / year
+    const row: Record<string, number> = { calls, self_hosted: m.selfYear };
+    m.front.forEach((t) => { row[t.id] = calls * t.perCall; });
     return row;
   }), [m]);
 
@@ -230,17 +231,17 @@ function ScenarioTab() {
             </p>
           </Section>
 
-          <Section title="Annual cost vs volume, with the crossover">
+          <Section title="Annual cost vs API calls, with the crossover">
             <div style={{ height: 300 }}><ResponsiveContainer><LineChart data={chart} margin={{ left: 10, right: 20 }}>
-              <CartesianGrid /><XAxis dataKey="V" scale="log" domain={["auto", "auto"]} type="number" tickFormatter={(v) => fmtNum(v)} /><YAxis scale="log" domain={["auto", "auto"]} tickFormatter={(v) => fmtUsd(v, 0)} width={80} />
-              <Tooltip content={<Tip fmt={(v) => fmtUsd(v, 0)} />} labelFormatter={(v) => `${fmtNum(v)} extractions / year`} /><Legend />
+              <CartesianGrid /><XAxis dataKey="calls" scale="log" domain={["auto", "auto"]} type="number" tickFormatter={(v) => fmtNum(v)} /><YAxis scale="log" domain={["auto", "auto"]} tickFormatter={(v) => fmtUsd(v, 0)} width={80} />
+              <Tooltip content={<Tip fmt={(v) => fmtUsd(v, 0)} />} labelFormatter={(v) => `${fmtNum(v)} API calls / year`} /><Legend />
               {m.front.map((t) => <Line key={t.id} type="monotone" dataKey={t.id} name={t.key} stroke={t.c} dot={false} strokeWidth={2} />)}
               <Line type="monotone" dataKey="self_hosted" name="self-hosted SLM" stroke="var(--series-1)" dot={false} strokeWidth={2} strokeDasharray="5 3" />
-              <ReferenceLine x={m.tasksYear} stroke="var(--text-muted)" strokeDasharray="4 4" label={{ value: "you", fill: "var(--text-secondary)", fontSize: 11 }} />
-              {m.vcross != null && <ReferenceDot x={m.vcross} y={m.selfYear} r={5} fill="var(--series-1)" stroke="var(--surface-1)" strokeWidth={2} label={{ value: "crossover", position: "top", fill: "var(--text-secondary)", fontSize: 11 }} />}
+              <ReferenceLine x={m.callsYear} stroke="var(--text-muted)" strokeDasharray="4 4" label={{ value: "you", fill: "var(--text-secondary)", fontSize: 11 }} />
+              {m.callsCross != null && <ReferenceDot x={m.callsCross} y={m.selfYear} r={5} fill="var(--series-1)" stroke="var(--surface-1)" strokeWidth={2} label={{ value: "crossover", position: "top", fill: "var(--text-secondary)", fontSize: 11 }} />}
             </LineChart></ResponsiveContainer></div>
-            <p className="muted text-xs mt-2">{m.vcross != null
-              ? `The self-hosted line is flat because a warm pool costs the same regardless of volume, until it runs out of capacity. It overtakes the cheapest frontier tier (${m.cheapest.key}) at about ${fmtNum(Math.round(m.vcross))} extractions / year. The dashed line marks the current ${fmtNum(m.tasksYear)} / year, which sits ${m.tasksYear < m.vcross ? "below the crossover, so renting wins today" : "above the crossover, so owning wins today"}.`
+            <p className="muted text-xs mt-2">{m.callsCross != null
+              ? `The horizontal axis is API calls per year, which is what drives token spend. The self-hosted line is flat because a warm pool costs the same regardless of load, until it runs out of capacity. It overtakes the cheapest frontier tier (${m.cheapest.key}) at about ${fmtNum(Math.round(m.callsCross))} API calls / year. The dashed line marks the current ${fmtNum(Math.round(m.callsYear))} API calls / year (${fmtNum(m.tasksYear)} extractions × ${m.effCalls.toFixed(1)} calls each), which sits ${m.callsYear < m.callsCross ? "below the crossover, so renting wins today" : "above the crossover, so owning wins today"}.`
               : "At these settings the frontier tier is always cheaper."}</p>
           </Section>
         </div>
