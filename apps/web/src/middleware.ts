@@ -23,4 +23,5 @@ export function middleware(req: NextRequest): NextResponse {
 }
 
 // Gate every route except Next's static assets, the image optimizer, and the favicon.
-export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"] };
+// extraction-scenario is a public, shareable calculator: exclude it from the gate.
+export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico|extraction-scenario).*)"] };
