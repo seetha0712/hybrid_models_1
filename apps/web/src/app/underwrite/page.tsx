@@ -22,6 +22,17 @@ export default function Underwrite() {
     <div>
       <h1 className="text-xl font-semibold">Re-underwrite annually</h1>
       <p className="muted text-sm">Monthly cost by volume for three ways to run one workload. Frontier prices deflate ~{PRICING.frontier_deflation_per_year}× per year at fixed capability, so the crossover where self-hosting wins moves right every year: build only what clears the bar for two or more years.</p>
+      <details className="card mt-3" style={{ padding: "0.8rem 1rem" }}>
+        <summary style={{ cursor: "pointer", fontWeight: 600 }}>How to read this chart</summary>
+        <ul className="text-sm mt-2" style={{ lineHeight: 1.6, paddingLeft: "1.1rem", listStyle: "disc" }}>
+          <li>Three cost curves are compared: renting the flagship model, renting a smaller model, and self-hosting a small owned model.</li>
+          <li>Both axes are logarithmic. The horizontal axis is monthly task volume; the vertical axis is monthly cost.</li>
+          <li>The two rented curves start near zero and rise in proportion to volume. The self-hosted curve is nearly flat at low volume, because a warm pool of compute and the staff to run it are a fixed monthly cost, then rises slowly as volume grows.</li>
+          <li>The crossover is the volume at which the self-hosted curve falls below the small-tier curve. Below it, renting is cheaper; above it, owning is cheaper. The tiles above the chart report the monthly cost of each option at the selected volume, and the crossover volume.</li>
+          <li>The years-ahead control divides frontier prices by about {PRICING.frontier_deflation_per_year}× per year. Moving it forward slides the crossover to the right, which shrinks the set of workloads worth owning.</li>
+          <li>Reading rule: build only when the self-hosted curve is clearly the lowest at the operating volume and stays lowest one to two years into the future. Otherwise rent.</li>
+        </ul>
+      </details>
       <div className="grid md:grid-cols-3 gap-4 mt-3">
         <div className="card space-y-3">
           <Slider label="Years ahead (frontier ÷10 / yr)" v={years} set={setYears} min={0} max={3} step={0.25} fmt={(n) => `${n} y`} />
