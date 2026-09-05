@@ -145,8 +145,8 @@ function ScenarioTab() {
           <Num label="Clauses to extract per document" v={clauses} set={setClauses} hint="context only" />
           <div className="text-sm font-semibold mt-2">RAG shape and tokens</div>
           <Num label="Prompt sets (API calls) per extraction" v={promptSets} set={setPromptSets} />
-          <Num label="Input tokens per prompt set" v={inSet} set={setInSet} step={50} hint="instruction + retrieved context; ~1 page of dense text" />
-          <Num label="Output tokens per prompt set" v={outSet} set={setOutSet} step={50} hint="the extracted fields returned by the model" />
+          <Num label="Input tokens per prompt set" v={inSet} set={setInSet} step={50} hint="instruction + retrieved context; the ~1 page you described (about 800 tokens)" />
+          <Num label="Output tokens per prompt set" v={outSet} set={setOutSet} step={50} hint="assumption: compact extracted fields per call, ~150 words; raise it if the model returns full clause text" />
           <Num label="Re-execution rate (%)" v={reexec} set={setReexec} hint="share of calls retried in a day; multiplies calls and tokens" />
           <div className="text-sm font-semibold mt-2">Self-hosted assumption</div>
           <label className="text-sm block"><div className="flex justify-between"><span>GPU type</span><span className="mono">{fmtUsd(PRICING.modal.gpu_per_hour[gpuType] ?? 0, 2)}/hr</span></div>
@@ -155,7 +155,7 @@ function ScenarioTab() {
             </select>
           </label>
           <Num label="Warm GPUs (kept always on)" v={gpus} set={setGpus} hint="a warm pool billed whether busy or not" />
-          <Num label="Warm hours per month" v={hoursMo} set={setHoursMo} step={10} hint="730 = always on; lower it for scale-to-zero" />
+          <Num label="Warm hours per month" v={hoursMo} set={setHoursMo} step={10} hint="730 = 24h × ~30.4 days, i.e. always on; lower for business hours or scale-to-zero" />
           <Num label="MLOps + monitoring $/month" v={mlops} set={setMlops} step={50} hint="share of an engineer, logging, evals" />
         </div>
 
