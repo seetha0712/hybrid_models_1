@@ -1,9 +1,12 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useT } from "@/lib/i18n";
+import type { MsgKey } from "@/lib/messages";
 
-const items = [["/", "Overview"], ["/spectrum", "Spectrum"], ["/router", "Router"], ["/guardrail", "Guardrail"], ["/batch", "Batch"], ["/underwrite", "Underwrite"], ["/extraction-scenario", "Extraction"], ["/architecture", "Architecture"], ["/research", "Paper"]];
+const items: [string, MsgKey][] = [["/", "nav.overview"], ["/spectrum", "nav.spectrum"], ["/router", "nav.router"], ["/guardrail", "nav.guardrail"], ["/batch", "nav.batch"], ["/underwrite", "nav.underwrite"], ["/extraction-scenario", "nav.extraction"], ["/architecture", "nav.architecture"], ["/research", "nav.paper"]];
 export function Nav() {
   const p = usePathname();
-  return <nav className="pill-nav flex gap-1">{items.map(([href, label]) => <Link key={href} href={href} aria-current={p === href ? "page" : undefined}>{label}</Link>)}</nav>;
+  const t = useT();
+  return <nav className="pill-nav flex gap-1">{items.map(([href, key]) => <Link key={href} href={href} aria-current={p === href ? "page" : undefined}>{t(key)}</Link>)}</nav>;
 }

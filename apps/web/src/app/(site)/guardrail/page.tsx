@@ -6,6 +6,7 @@ import { Note, Section, StatTile, Tip } from "@/components/ui";
 import { api, isConfigured } from "@/lib/api";
 import { ENTITY_COLOR } from "@/lib/palette";
 import { fmtNum, fmtPct } from "@/lib/pricing";
+import { useT } from "@/lib/i18n";
 import type { PiiEval, PiiResponse } from "@/lib/types";
 
 const E = piiEval as unknown as PiiEval;
@@ -19,6 +20,7 @@ function Highlight({ text, ents }: { text: string; ents: PiiResponse["entities"]
 }
 
 export default function Guardrail() {
+  const t = useT();
   const [text, setText] = useState(SAMPLE);
   const [res, setRes] = useState<PiiResponse | null>(null);
   const [busy, setBusy] = useState(false);
@@ -28,33 +30,33 @@ export default function Guardrail() {
   const data = labels.map((l) => ({ label: l, model: E.model_union_regex?.per_label?.[l]?.f1 ?? null, regex: E.regex_only?.per_label?.[l]?.f1 ?? null }));
   return (
     <div>
-      <h1 className="text-xl font-semibold">Phase 3 · the PII guardrail</h1>
+      <h1 className="text-xl font-semibold">{t("guard.title")}</h1>
       <p className="muted text-sm">A {E.base} token classifier (full fine-tune) runs in front of every frontier call; numeric patterns are unioned with a Luhn-checked regex. The frontier only ever sees placeholders; the answer is de-redacted on the way back.</p>
       <Note status={E.status} note={E.note} />
       <div className="grid md:grid-cols-4 gap-3 mt-3">
-        <StatTile label="Entity F1 · model ∪ regex" value={fmtPct(E.model_union_regex?.f1)} sub={`${fmtNum(E.model_union_regex?.n)} held-out texts`} color="var(--series-1)" />
-        <StatTile label="Entity F1 · regex only" value={fmtPct(E.regex_only?.f1)} sub={`names: ${fmtPct(E.regex_only?.per_label?.PER?.f1 ?? 0)}`} color="var(--series-2)" />
-        <StatTile label="Guard latency p50" value={E.latency_ms?.p50 != null ? `${E.latency_ms.p50} ms` : "—"} sub="CPU, 2 threads" />
-        <StatTile label="PII sent to frontier (this session)" value="0" sub={`${count} entities redacted live`} color="var(--series-6)" />
+        <StatTile label={t("guard.stat.f1model")} value={fmtPct(E.model_union_regex?.f1)} sub={`${fmtNum(E.model_union_regex?.n)} ${t("guard.stat.f1model.sub")}`} color="var(--series-1)" />
+        <StatTile label={t("guard.stat.f1regex")} value={fmtPct(E.regex_only?.f1)} sub={`${t("guard.stat.f1regex.sub")} ${fmtPct(E.regex_only?.per_label?.PER?.f1 ?? 0)}`} color="var(--series-2)" />
+        <StatTile label={t("guard.stat.latency")} value={E.latency_ms?.p50 != null ? `${E.latency_ms.p50} ms` : "—"} sub={t("guard.stat.latency.sub")} />
+        <StatTile label={t("guard.stat.piiSession")} value="0" sub={`${count} ${t("guard.stat.piiSession.sub")}`} color="var(--series-6)" />
       </div>
-      <Section title="Try it" right={<button className="btn btn-primary" onClick={run} disabled={busy || !isConfigured()}>{busy ? "…" : "Redact"}</button>}>
+      <Section title={t("guard.section.try")} right={<button className="btn btn-primary" onClick={run} disabled={busy || !isConfigured()}>{busy ? "…" : t("guard.redact.btn")}</button>}>
         <textarea rows={4} value={text} onChange={(e) => setText(e.target.value)} />
-        {!isConfigured() && <p className="muted text-xs mt-2">Offline: set NEXT_PUBLIC_API_BASE to enable live calls.</p>}
+        {!isConfigured() && <p className="muted text-xs mt-2">{t("spectrum.offline")}</p>}
         {res && (
           <div className="grid md:grid-cols-2 gap-3 mt-3">
-            <div className="card"><div className="muted text-xs uppercase">raw · {res.entities.length} entities found by {res.model} in {res.latency_ms} ms</div><Highlight text={text} ents={res.entities} /></div>
-            <div className="card"><div className="muted text-xs uppercase">what the frontier model receives</div><div className="text-sm leading-7 mono">{res.redacted}</div></div>
-            <div className="md:col-span-2"><table className="data"><thead><tr><th>Label</th><th>Text</th><th>Score</th></tr></thead><tbody>{res.entities.map((e, i) => <tr key={i}><td><span className="swatch" style={{ background: ENTITY_COLOR[e.label] }} />{e.label}</td><td className="mono">{text.slice(e.start, e.end)}</td><td className="mono">{e.score ?? "regex"}</td></tr>)}</tbody></table></div>
+            <div className="card"><div className="muted text-xs uppercase">{t("guard.raw")} {res.entities.length} · {res.model} · {res.latency_ms} ms</div><Highlight text={text} ents={res.entities} /></div>
+            <div className="card"><div className="muted text-xs uppercase">{t("guard.received")}</div><div className="text-sm leading-7 mono">{res.redacted}</div></div>
+            <div className="md:col-span-2"><table className="data"><thead><tr><th>{t("guard.th.label")}</th><th>{t("guard.th.text")}</th><th>{t("guard.th.score")}</th></tr></thead><tbody>{res.entities.map((e, i) => <tr key={i}><td><span className="swatch" style={{ background: ENTITY_COLOR[e.label] }} />{e.label}</td><td className="mono">{text.slice(e.start, e.end)}</td><td className="mono">{e.score ?? "regex"}</td></tr>)}</tbody></table></div>
           </div>
         )}
       </Section>
-      <Section title="Entity-level F1 by label: fine-tuned model vs regex">
+      <Section title={t("guard.section.f1")}>
         <div style={{ height: 240 }}><ResponsiveContainer><BarChart data={data} margin={{ left: 10, right: 10 }} barGap={2} barSize={18}>
           <CartesianGrid vertical={false} /><XAxis dataKey="label" /><YAxis domain={[0, 1]} tickFormatter={(v) => `${Math.round(v * 100)}%`} width={50} />
           <Tooltip content={<Tip fmt={(v) => fmtPct(v)} />} cursor={{ fill: "var(--surface-2)" }} /><Legend />
           <Bar dataKey="model" name="model ∪ regex" fill="var(--series-1)" radius={[4, 4, 0, 0]} /><Bar dataKey="regex" name="regex only" fill="var(--series-2)" radius={[4, 4, 0, 0]} />
         </BarChart></ResponsiveContainer></div>
-        <p className="muted text-xs">Regex cannot find names or addresses; that gap is the case for the model. Dataset: ai4privacy FinPII (human-validated, six languages, no Japanese).</p>
+        <p className="muted text-xs">{t("guard.f1.caption")}</p>
       </Section>
     </div>
   );
