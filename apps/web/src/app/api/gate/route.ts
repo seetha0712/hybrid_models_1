@@ -1,6 +1,6 @@
 // Verifies the site password and, on success, sets the httpOnly auth cookie the middleware checks.
 import { NextRequest, NextResponse } from "next/server";
-import { AUTH_COOKIE } from "@/lib/gate";
+import { AUTH_COOKIE, acceptedPasswords } from "@/lib/gate";
 
 export const runtime = "edge";
 
@@ -13,11 +13,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const form = await req.formData();
   const password = String(form.get("password") ?? "");
   const next = safeNext(String(form.get("next") ?? "/"));
-  const PASSWORD = process.env.SITE_PASSWORD;
+  const accepted = acceptedPasswords();
   const url = req.nextUrl.clone();
   url.search = "";
 
-  if (PASSWORD && password === PASSWORD) {
+  if (accepted.includes(password)) {
     url.pathname = next;
     const res = NextResponse.redirect(url, 303);
     res.cookies.set(AUTH_COOKIE, password, {

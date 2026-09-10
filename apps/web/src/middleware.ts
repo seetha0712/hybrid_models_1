@@ -4,16 +4,15 @@
 // env var — not committed, not in the client bundle); if it is unset the gate fails closed.
 // (Basic-Auth prompts can't be used here: Vercel strips the WWW-Authenticate header from middleware.)
 import { NextRequest, NextResponse } from "next/server";
-import { AUTH_COOKIE } from "@/lib/gate";
-
-const PASSWORD = process.env.SITE_PASSWORD;
+import { AUTH_COOKIE, acceptedPasswords } from "@/lib/gate";
 
 export function middleware(req: NextRequest): NextResponse {
   const { pathname } = req.nextUrl;
   // The gate page and its verify endpoint must be reachable while unauthenticated.
   if (pathname === "/gate" || pathname.startsWith("/api/gate")) return NextResponse.next();
 
-  if (PASSWORD && req.cookies.get(AUTH_COOKIE)?.value === PASSWORD) return NextResponse.next();
+  const cookie = req.cookies.get(AUTH_COOKIE)?.value;
+  if (cookie && acceptedPasswords().includes(cookie)) return NextResponse.next();
 
   const url = req.nextUrl.clone();
   url.pathname = "/gate";
