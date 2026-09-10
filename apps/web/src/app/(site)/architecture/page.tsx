@@ -2,6 +2,7 @@
 // Diagram-first: system assembly, the full routing decision, redaction and router logic, and the
 // training configuration of every component. Neutral voice, no second person.
 import Link from "next/link";
+import { getLocale } from "@/lib/i18n-server";
 
 export const metadata = {
   title: "Architecture and training detail - The Model Spectrum",
@@ -179,63 +180,64 @@ function ConfigCard({ title, color, rows }: { title: string; color: string; rows
   );
 }
 
-export default function ArchitecturePage() {
+export default async function ArchitecturePage() {
+  const ja = (await getLocale()) === "ja";
   return (
     <article style={{ maxWidth: 900, margin: "0 auto", ...serif }}>
       <header style={{ borderBottom: "2px solid var(--border)", paddingBottom: "0.9rem" }}>
-        <p style={{ ...sysFont, fontSize: "0.8rem", letterSpacing: "0.09em", textTransform: "uppercase", color: "var(--series-1)", fontWeight: 700, margin: 0 }}>Experiment by Seetha</p>
-        <h1 style={{ fontSize: "1.55rem", lineHeight: 1.22, fontWeight: 700, margin: "0.45rem 0 0.35rem" }}>Architecture and training detail</h1>
+        <p style={{ ...sysFont, fontSize: "0.8rem", letterSpacing: "0.09em", textTransform: "uppercase", color: "var(--series-1)", fontWeight: 700, margin: 0 }}>{ja ? "Seetha による実験" : "Experiment by Seetha"}</p>
+        <h1 style={{ fontSize: "1.55rem", lineHeight: 1.22, fontWeight: 700, margin: "0.45rem 0 0.35rem" }}>{ja ? "アーキテクチャと学習の詳細" : "Architecture and training detail"}</h1>
         <p style={{ fontSize: "0.98rem", color: "var(--text-secondary)", margin: 0 }}>
-          How the gateway is assembled, how every query is routed, how redaction and classification are decided, and the exact training configuration of each model.
+          {ja ? "ゲートウェイの構成、各クエリのルーティング方法、マスキングと分類の判定方法、そして各モデルの正確な学習設定を解説します。" : "How the gateway is assembled, how every query is routed, how redaction and classification are decided, and the exact training configuration of each model."}
         </p>
       </header>
 
-      <H n="1" id="a1">System assembly</H>
+      <H n="1" id="a1">{ja ? "システム構成" : "System assembly"}</H>
       <p style={p}>
-        A single gateway serves all traffic. It runs as a small server on shared CPU that scales to zero when idle. When a container starts, it loads the trained artefacts from a shared volume: the owned classifier, the privacy model, the intent probe, and the frozen few-shot prompt used by the frontier tiers. If the privacy model is missing it falls back to regular expressions alone. Two tiers live outside the gateway: the open-weights model runs as a separate GPU service that also scales to zero, and the frontier tiers are the Anthropic API. The classifier, the guard and the router run inside the gateway process on CPU; the two heavier tiers are called out over the network only when the plan requires them.
+        {ja ? "単一のゲートウェイがすべてのトラフィックを処理します。アイドル時にはゼロにスケールする共有CPU上の小さなサーバーとして動作します。コンテナ起動時に、学習済みの成果物を共有ボリュームから読み込みます。自社保有の分類器、プライバシーモデル、意図プローブ、そしてフロンティア階層が用いる固定few-shotプロンプトです。プライバシーモデルが存在しない場合は正規表現のみにフォールバックします。2つの階層はゲートウェイの外にあります。オープンウェイトモデルは同じくゼロにスケールする別GPUサービスとして動作し、フロンティア階層はAnthropic APIです。分類器・ガード・ルーターはゲートウェイのプロセス内でCPU上で動作し、重い2階層は計画が必要とする場合にのみネットワーク越しに呼び出されます。" : "A single gateway serves all traffic. It runs as a small server on shared CPU that scales to zero when idle. When a container starts, it loads the trained artefacts from a shared volume: the owned classifier, the privacy model, the intent probe, and the frozen few-shot prompt used by the frontier tiers. If the privacy model is missing it falls back to regular expressions alone. Two tiers live outside the gateway: the open-weights model runs as a separate GPU service that also scales to zero, and the frontier tiers are the Anthropic API. The classifier, the guard and the router run inside the gateway process on CPU; the two heavier tiers are called out over the network only when the plan requires them."}
       </p>
-      <Fig n={1} caption="The gateway loads its models from the volume at startup, answers the cheap tiers in-process on CPU, and reaches out to the GPU service or the Anthropic API only for the tiers a request actually needs. Access needs a demo key and is rate limited.">
+      <Fig n={1} caption={ja ? "ゲートウェイは起動時にボリュームからモデルを読み込み、安価な階層をCPU上のプロセス内で処理し、リクエストが実際に必要とする階層に限りGPUサービスやAnthropic APIを呼び出します。アクセスにはデモキーが必要で、レート制限があります。" : "The gateway loads its models from the volume at startup, answers the cheap tiers in-process on CPU, and reaches out to the GPU service or the Anthropic API only for the tiers a request actually needs. Access needs a demo key and is rate limited."}>
         <AssemblyFigure />
       </Fig>
 
-      <H n="2" id="a2">How a query is decided</H>
+      <H n="2" id="a2">{ja ? "クエリの判定方法" : "How a query is decided"}</H>
       <p style={p}>
-        Every call to the routing endpoint follows the same fixed procedure. The steps below list the exact thresholds used.
+        {ja ? "ルーティングエンドポイントへのすべての呼び出しは、同じ固定手順に従います。以下の各ステップに、使用する正確なしきい値を記載します。" : "Every call to the routing endpoint follows the same fixed procedure. The steps below list the exact thresholds used."}
       </p>
       <ol style={{ ...p, paddingLeft: "1.3rem" }}>
-        <li style={{ margin: "0.4rem 0" }}><strong>Redact.</strong> The privacy guard runs first and replaces every detected identifier with a placeholder. Only the redacted text continues. Nothing downstream sees a raw identifier.</li>
-        <li style={{ margin: "0.4rem 0" }}><strong>Classify intent.</strong> The redacted text is embedded and passed to the calibrated probe, which returns an intent and a confidence between zero and one.</li>
-        <li style={{ margin: "0.4rem 0" }}><strong>Plan the chain.</strong> If a tier is forced, that single tier is used. Otherwise, if the intent is unknown or the confidence is below <span className="mono">0.55</span>, the request takes the general path Haiku then Sonnet. Otherwise it takes the chain configured for that intent. If the input is estimated above <span className="mono">6000</span> tokens, the on-prem tiers are removed from the chain. The chain is capped at <span className="mono">2</span> hops.</li>
-        <li style={{ margin: "0.4rem 0" }}><strong>Run the cascade.</strong> The tiers in the chain are called in order. After each hop the controller escalates one step if the call failed, if the owned model top probability is below <span className="mono">0.80</span>, or if a language-model tier reports <span className="mono">low</span> confidence. The first adequate hop wins; otherwise the last hop answers.</li>
-        <li style={{ margin: "0.4rem 0" }}><strong>De-redact and report.</strong> The placeholders in the answer are replaced with the original entities, and the response carries a per-hop receipt of tokens, latency and cost.</li>
+        <li style={{ margin: "0.4rem 0" }}><strong>{ja ? "マスキング。" : "Redact."}</strong> {ja ? "プライバシーガードが最初に動作し、検出したすべての識別子をプレースホルダに置き換えます。マスキング後のテキストのみが後続に渡ります。下流で生の識別子を見ることはありません。" : "The privacy guard runs first and replaces every detected identifier with a placeholder. Only the redacted text continues. Nothing downstream sees a raw identifier."}</li>
+        <li style={{ margin: "0.4rem 0" }}><strong>{ja ? "意図の分類。" : "Classify intent."}</strong> {ja ? "マスキング後のテキストを埋め込み、較正済みプローブに渡すと、意図と0〜1の確信度が返ります。" : "The redacted text is embedded and passed to the calibrated probe, which returns an intent and a confidence between zero and one."}</li>
+        <li style={{ margin: "0.4rem 0" }}><strong>{ja ? "チェーンの計画。" : "Plan the chain."}</strong> {ja ? "階層が強制指定されていればその単一階層を使います。そうでなく、意図が不明または確信度が " : "If a tier is forced, that single tier is used. Otherwise, if the intent is unknown or the confidence is below "}<span className="mono">0.55</span>{ja ? " 未満の場合、リクエストは一般経路 Haiku → Sonnet を通ります。それ以外は、その意図に設定されたチェーンを通ります。入力が " : ", the request takes the general path Haiku then Sonnet. Otherwise it takes the chain configured for that intent. If the input is estimated above "}<span className="mono">6000</span>{ja ? " トークンを超えると推定される場合、オンプレ階層はチェーンから外れます。チェーンは最大 " : " tokens, the on-prem tiers are removed from the chain. The chain is capped at "}<span className="mono">2</span>{ja ? " ホップに制限されます。" : " hops."}</li>
+        <li style={{ margin: "0.4rem 0" }}><strong>{ja ? "カスケードの実行。" : "Run the cascade."}</strong> {ja ? "チェーン内の階層を順に呼び出します。各ホップの後、呼び出しが失敗した場合、自社モデルの最大確率が " : "The tiers in the chain are called in order. After each hop the controller escalates one step if the call failed, if the owned model top probability is below "}<span className="mono">0.80</span>{ja ? " 未満の場合、または言語モデル階層が " : ", or if a language-model tier reports "}<span className="mono">low</span>{ja ? " 確信度を報告した場合に、1段階エスカレーションします。最初に十分な結果を出したホップが採用され、なければ最後のホップが回答します。" : " confidence. The first adequate hop wins; otherwise the last hop answers."}</li>
+        <li style={{ margin: "0.4rem 0" }}><strong>{ja ? "復元と報告。" : "De-redact and report."}</strong> {ja ? "回答内のプレースホルダを元の項目に置き換え、レスポンスにはホップごとのトークン数・レイテンシ・コストの明細が付きます。" : "The placeholders in the answer are replaced with the original entities, and the response carries a per-hop receipt of tokens, latency and cost."}</li>
       </ol>
 
-      <H n="3" id="a3">Every path a query can take</H>
+      <H n="3" id="a3">{ja ? "クエリが取り得るすべての経路" : "Every path a query can take"}</H>
       <p style={p}>
-        The router recognises eight workload classes, each with its own chain. Three overrides can change the chain before it runs: a forced tier, a low-confidence or unknown intent, and a very long input. Figure 3 shows all of them, with the condition that triggers the single escalation step in each.
+        {ja ? "ルーターは8つのワークロード種別を認識し、それぞれに専用のチェーンがあります。実行前にチェーンを変更し得る3つのオーバーライドがあります。階層の強制指定、低確信度または不明な意図、そして非常に長い入力です。図3はそれらすべてと、各々で単一のエスカレーションを引き起こす条件を示します。" : "The router recognises eight workload classes, each with its own chain. Three overrides can change the chain before it runs: a forced tier, a low-confidence or unknown intent, and a very long input. Figure 3 shows all of them, with the condition that triggers the single escalation step in each."}
       </p>
-      <Fig n={3} caption="Every routing path. Colour marks where each tier runs: blue and yellow are on CPU inside the gateway, aqua is the private GPU, and the magenta and violet tiers are the frontier API. The cascade never exceeds two hops.">
+      <Fig n={3} caption={ja ? "すべてのルーティング経路。色は各階層の実行場所を示します。青と黄はゲートウェイ内のCPU、アクアはプライベートGPU、マゼンタと紫はフロンティアAPIです。カスケードは2ホップを超えません。" : "Every routing path. Colour marks where each tier runs: blue and yellow are on CPU inside the gateway, aqua is the private GPU, and the magenta and violet tiers are the frontier API. The cascade never exceeds two hops."}>
         <PathsFigure />
       </Fig>
 
-      <H n="4" id="a4">How redaction is decided</H>
+      <H n="4" id="a4">{ja ? "マスキングの判定方法" : "How redaction is decided"}</H>
       <p style={p}>
-        Redaction combines two detectors. High-precision regular expressions catch structured identifiers: email addresses, card numbers validated with the Luhn checksum, phone numbers, account and routing numbers, and dates of birth. The fine-tuned DistilBERT tagger catches the rest, in particular names and addresses, which pattern matching cannot see. The two sets of spans are merged into a non-overlapping list, and on any overlap a specific label is preferred over the catch-all OTHER, so a card number is labelled as a card rather than as generic text. Each surviving span is replaced with a numbered placeholder such as <span className="mono">[CARD_1]</span>, and the mapping from placeholder to original is kept so the final answer can be restored. Because this runs before the router and before any model call, no raw identifier reaches the classifier, the on-prem tiers, the GPU service or the frontier API.
+        {ja ? "マスキングは2つの検出器を組み合わせます。高精度の正規表現が構造化された識別子を捉えます。メールアドレス、Luhnチェックサムで検証したカード番号、電話番号、口座・支店番号、生年月日です。ファインチューニング済みのDistilBERTタガーが残り、特にパターンマッチングでは見えない氏名と住所を捉えます。2つのスパン集合は重複のないリストに統合され、重複時には汎用のOTHERよりも具体的なラベルが優先されるため、カード番号は汎用テキストではなくカードとしてラベル付けされます。残った各スパンは " : "Redaction combines two detectors. High-precision regular expressions catch structured identifiers: email addresses, card numbers validated with the Luhn checksum, phone numbers, account and routing numbers, and dates of birth. The fine-tuned DistilBERT tagger catches the rest, in particular names and addresses, which pattern matching cannot see. The two sets of spans are merged into a non-overlapping list, and on any overlap a specific label is preferred over the catch-all OTHER, so a card number is labelled as a card rather than as generic text. Each surviving span is replaced with a numbered placeholder such as "}<span className="mono">[CARD_1]</span>{ja ? " のような番号付きプレースホルダに置き換えられ、プレースホルダから元の値への対応表を保持することで最終回答を復元できます。これはルーターの前、いかなるモデル呼び出しの前にも実行されるため、生の識別子が分類器、オンプレ階層、GPUサービス、フロンティアAPIに届くことはありません。" : ", and the mapping from placeholder to original is kept so the final answer can be restored. Because this runs before the router and before any model call, no raw identifier reaches the classifier, the on-prem tiers, the GPU service or the frontier API."}
       </p>
-      <Fig n={4} caption="The redaction path. Regular expressions and the learned tagger run in parallel, their spans are merged with a preference for specific labels, and only redacted text moves on. The surrogate map enables exact restoration afterwards.">
+      <Fig n={4} caption={ja ? "マスキングの経路。正規表現と学習済みタガーが並列に動作し、具体的なラベルを優先してスパンを統合し、マスキング後のテキストのみが先に進みます。対応表により後で正確に復元できます。" : "The redaction path. Regular expressions and the learned tagger run in parallel, their spans are merged with a preference for specific labels, and only redacted text moves on. The surrogate map enables exact restoration afterwards."}>
         <RedactionFigure />
       </Fig>
 
-      <H n="5" id="a5">How classification and routing are decided</H>
+      <H n="5" id="a5">{ja ? "分類とルーティングの判定方法" : "How classification and routing are decided"}</H>
       <p style={p}>
-        Two different classifiers are involved, and it helps to keep them separate. The owned model in the R5 tier decides the spending category of a transaction. The router decides the workload class of an arbitrary request, which determines the tier chain. The router is a linear probe: a frozen multilingual sentence encoder turns the redacted text into a fixed vector, and a calibrated logistic-regression head assigns a probability to each of the eight classes. The predicted class is the highest probability, and the confidence is that probability. Calibration matters here, because the plan trusts the number: high-confidence routes are correct almost always, so a low confidence can safely be diverted to the general frontier path rather than to a specialised chain that might be wrong. The owned classifier reports its own confidence as the softmax maximum over the label set, and the cascade escalates when that maximum is below 0.80, which is how novel merchants are handed up to a stronger model.
+        {ja ? "2つの異なる分類器が関与しており、両者を区別しておくと理解しやすくなります。R5階層の自社モデルは取引の支出カテゴリを判定します。ルーターは任意のリクエストのワークロード種別を判定し、これが階層チェーンを決めます。ルーターは線形プローブです。凍結した多言語文エンコーダがマスキング後のテキストを固定ベクトルに変換し、較正済みのロジスティック回帰ヘッドが8つの種別それぞれに確率を割り当てます。予測種別は最大確率のもので、確信度はその確率です。ここでは較正が重要です。計画がその数値を信頼するためで、高確信度のルートはほぼ常に正しく、低確信度は誤り得る専用チェーンではなく一般フロンティア経路へ安全に迂回できます。自社分類器は自身の確信度をラベル集合上のsoftmax最大値として報告し、その最大値が0.80未満のときカスケードがエスカレーションします。これが未知の加盟店をより強いモデルへ引き上げる仕組みです。" : "Two different classifiers are involved, and it helps to keep them separate. The owned model in the R5 tier decides the spending category of a transaction. The router decides the workload class of an arbitrary request, which determines the tier chain. The router is a linear probe: a frozen multilingual sentence encoder turns the redacted text into a fixed vector, and a calibrated logistic-regression head assigns a probability to each of the eight classes. The predicted class is the highest probability, and the confidence is that probability. Calibration matters here, because the plan trusts the number: high-confidence routes are correct almost always, so a low confidence can safely be diverted to the general frontier path rather than to a specialised chain that might be wrong. The owned classifier reports its own confidence as the softmax maximum over the label set, and the cascade escalates when that maximum is below 0.80, which is how novel merchants are handed up to a stronger model."}
       </p>
 
-      <H n="6" id="a6">Training and configuration</H>
+      <H n="6" id="a6">{ja ? "学習と設定" : "Training and configuration"}</H>
       <p style={p}>
-        The trainable components and their exact settings are listed below. Every model is trained on serverless GPUs and evaluated with the protocol described in the paper.
+        {ja ? "学習対象のコンポーネントとその正確な設定を以下に示します。すべてのモデルはサーバーレスGPUで学習し、論文に記載のプロトコルで評価しました。（仕様表は技術用語のため英語で記載します。）" : "The trainable components and their exact settings are listed below. Every model is trained on serverless GPUs and evaluated with the protocol described in the paper."}
       </p>
-      <ConfigCard title="Owned tiny decoder (R5 / R6) - trained from scratch" color="var(--series-1)" rows={[
+      <ConfigCard title={ja ? "自社の小型デコーダ (R5 / R6) — ゼロから学習" : "Owned tiny decoder (R5 / R6) - trained from scratch"} color="var(--series-1)" rows={[
         ["Type", "Pre-layernorm causal Transformer decoder, random initialisation"],
         ["Parameters", "1,722,368 total"],
         ["Shape", "6 layers, model width 128, 4 attention heads, feed-forward 512, context 64 tokens"],
@@ -248,7 +250,7 @@ export default function ArchitecturePage() {
         ["Hardware and time", "One T4 GPU, about 107 seconds; latency measured on 2 CPU cores"],
         ["Confidence", "Softmax maximum over the label logits"],
       ]} />
-      <ConfigCard title="LoRA small language model (R5)" color="var(--series-2)" rows={[
+      <ConfigCard title={ja ? "LoRA 小型言語モデル (R5)" : "LoRA small language model (R5)"} color="var(--series-2)" rows={[
         ["Base", "Qwen3-0.6B, frozen, half precision"],
         ["Adapter", "LoRA rank 16, alpha 32, dropout 0.05, on the query, key, value and output projections"],
         ["Trainable", "4,587,520 of 600,000,000 parameters, about 0.76 percent"],
@@ -257,27 +259,27 @@ export default function ArchitecturePage() {
         ["Inference", "Left-padded, greedy, up to 8 new tokens, batches of 64; output snapped to the nearest label"],
         ["Hardware and time", "One T4 GPU, about 280 seconds"],
       ]} />
-      <ConfigCard title="Privacy guardrail (R5-PII)" color="var(--series-4)" rows={[
+      <ConfigCard title={ja ? "プライバシーガードレール (R5-PII)" : "Privacy guardrail (R5-PII)"} color="var(--series-4)" rows={[
         ["Base", "distilbert-base-multilingual-cased, about 134.7M parameters, full fine-tune"],
         ["Task", "Token classification with BIO tags over 8 coarse types (person, account, card, phone, email, address, date of birth, other), 17 tags"],
         ["Config", "Maximum length 128, batch 32, 3 epochs, learning rate 5e-5, weight decay 0.01, 6 percent warmup, half precision"],
         ["Serving", "Model spans unioned with high-precision regular expressions; median latency about 90 milliseconds per document"],
         ["Hardware and time", "One T4 GPU, about 165 seconds"],
       ]} />
-      <ConfigCard title="Intent router (R3)" color="var(--series-5)" rows={[
+      <ConfigCard title={ja ? "意図ルーター (R3)" : "Intent router (R3)"} color="var(--series-5)" rows={[
         ["Encoder", "paraphrase-multilingual-MiniLM-L12-v2, frozen, embeddings L2-normalised"],
         ["Head", "Logistic regression (C = 2.0), wrapped in five-fold probability calibration"],
         ["Trained", "Head only, 1600 examples, about 37 seconds"],
         ["Output", "Intent, calibrated confidence, and the top three classes"],
         ["Thresholds used by the plan", "Route as uncertain below 0.55 confidence; escalate the owned model below 0.80; long-input cut-off 6000 tokens; at most 2 hops"],
       ]} />
-      <ConfigCard title="Open-weights tier (R4)" color="var(--series-3)" rows={[
+      <ConfigCard title={ja ? "オープンウェイト階層 (R4)" : "Open-weights tier (R4)"} color="var(--series-3)" rows={[
         ["Model", "Qwen3-1.7B, half precision, scaled dot-product attention, served on a T4"],
         ["Serving", "Separate GPU service, scale-to-zero (0 warm by default, up to 2 containers), 4 concurrent inputs, 600-second idle window"],
         ["Latency", "Cold start about 35 to 60 seconds; warm about 1.5 to 4 seconds"],
         ["Generation", "Chat template, thinking disabled, greedy, up to 256 new tokens, JSON answer with a confidence field"],
       ]} />
-      <ConfigCard title="Frontier tiers (R2 / R1) - in-context learning only" color="var(--series-6)" rows={[
+      <ConfigCard title={ja ? "フロンティア階層 (R2 / R1) — 文脈内学習のみ" : "Frontier tiers (R2 / R1) - in-context learning only"} color="var(--series-6)" rows={[
         ["Models", "Claude Haiku 4.5 (R2), Claude Sonnet 5 and Claude Opus 5 (R1)"],
         ["Technique", "No weights trained; a frozen system prompt of instructions plus 60 stratified few-shot examples from the training split"],
         ["Caching", "The prompt is padded with more training rows until it clears the 4096-token cache minimum and is byte-identical across calls, so the prompt cache is reused"],
@@ -285,7 +287,7 @@ export default function ArchitecturePage() {
         ["Cost basis", "Measured tokens times list price with the cache discount; a 50 percent batch path exists, and a synchronous cached path is used when the batch queue is slow"],
       ]} />
 
-      <H n="7" id="a7">Where each tier runs and how it is billed</H>
+      <H n="7" id="a7">{ja ? "各階層の実行場所と課金方法" : "Where each tier runs and how it is billed"}</H>
       <div style={{ overflowX: "auto", margin: "0.8rem 0" }}>
         <table className="data" style={{ ...sysFont, fontSize: "0.84rem" }}>
           <thead><tr><th>Tier</th><th>Model</th><th>Where it runs</th><th>How it is invoked</th><th>Cost basis</th></tr></thead>
@@ -303,9 +305,9 @@ export default function ArchitecturePage() {
       </div>
 
       <div style={{ display: "flex", gap: "0.8rem", flexWrap: "wrap", ...sysFont, marginTop: "1.4rem" }}>
-        <Link href="/research" style={{ padding: "0.6rem 0.9rem", border: "1px solid var(--border)", borderRadius: 8, textDecoration: "none", fontWeight: 700, color: "var(--text-primary)", background: "var(--surface-1)" }}>Read the full write-up</Link>
-        <Link href="/router" style={{ padding: "0.6rem 0.9rem", border: "1px solid var(--border)", borderRadius: 8, textDecoration: "none", fontWeight: 700, color: "var(--text-primary)", background: "var(--surface-1)" }}>Watch a request route, live</Link>
-        <Link href="/guardrail" style={{ padding: "0.6rem 0.9rem", border: "1px solid var(--border)", borderRadius: 8, textDecoration: "none", fontWeight: 700, color: "var(--text-primary)", background: "var(--surface-1)" }}>Try the redaction guard</Link>
+        <Link href="/research" style={{ padding: "0.6rem 0.9rem", border: "1px solid var(--border)", borderRadius: 8, textDecoration: "none", fontWeight: 700, color: "var(--text-primary)", background: "var(--surface-1)" }}>{ja ? "詳細な解説を読む" : "Read the full write-up"}</Link>
+        <Link href="/router" style={{ padding: "0.6rem 0.9rem", border: "1px solid var(--border)", borderRadius: 8, textDecoration: "none", fontWeight: 700, color: "var(--text-primary)", background: "var(--surface-1)" }}>{ja ? "リクエストのルーティングをライブで見る" : "Watch a request route, live"}</Link>
+        <Link href="/guardrail" style={{ padding: "0.6rem 0.9rem", border: "1px solid var(--border)", borderRadius: 8, textDecoration: "none", fontWeight: 700, color: "var(--text-primary)", background: "var(--surface-1)" }}>{ja ? "マスキングガードを試す" : "Try the redaction guard"}</Link>
       </div>
     </article>
   );
