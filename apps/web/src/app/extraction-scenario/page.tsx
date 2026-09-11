@@ -1,5 +1,6 @@
 // Public, shareable cost calculator. Lives outside the (site) group so it uses the minimal root
 // layout: no gateway client, no demo key in its bundle. Excluded from the password gate in middleware.
+import Link from "next/link";
 import ExtractionScenario from "@/components/ExtractionScenario";
 import { LocaleToggle } from "@/components/LocaleToggle";
 import { getT } from "@/lib/i18n-server";
@@ -14,10 +15,11 @@ export default async function ExtractionScenarioPage() {
   return (
     <main className="px-6 py-6 max-w-6xl mx-auto">
       <header style={{ borderBottom: "1px solid var(--border)", paddingBottom: "0.8rem", marginBottom: "1rem" }}>
-        <div className="flex items-start justify-between gap-3">
-          <h1 className="text-xl font-semibold">{t("ex.pageTitle")}</h1>
+        <div className="flex items-center justify-between gap-3 mb-2">
+          <Link href="/" className="text-sm font-semibold" style={{ color: "var(--series-1)", textDecoration: "none" }}>{t("ex.backToMain")}</Link>
           <LocaleToggle />
         </div>
+        <h1 className="text-xl font-semibold">{t("ex.pageTitle")}</h1>
         <p className="muted text-sm mt-1">{t("ex.pageIntro")}</p>
       </header>
       <ExtractionScenario />

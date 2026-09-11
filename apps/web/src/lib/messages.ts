@@ -189,6 +189,7 @@ export const messages = {
   "uw.dotCaption": { en: "The filled dots sit on the dashed line at our current volume; each is coloured to its line, so read across to compare the three monthly costs at that volume.", ja: "塗りつぶしの点は現在の処理量における破線上にあり、各点は対応する線の色です。横に読むことで、その処理量での3つの月間コストを比較できます。" },
 
   // ---------------- extraction scenario (public page) ----------------
+  "ex.backToMain": { en: "← The Model Spectrum — main site", ja: "← モデル・スペクトラム — メインサイトへ" },
   "ex.pageTitle": { en: "Contract extraction: build versus buy", ja: "契約書抽出：内製 vs 購入" },
   "ex.pageIntro": {
     en: "An interactive cost model for a RAG document-extraction workload. Set the volume, the tokens per call, the model prices and the in-house platform assumptions to compare renting a frontier API against self-hosting a small model. Everything is computed in the browser; nothing is sent anywhere and no login is required.",
