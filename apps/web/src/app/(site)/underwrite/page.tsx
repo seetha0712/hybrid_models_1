@@ -76,7 +76,7 @@ export default function Underwrite() {
   const t = useT();
   const [tab, setTab] = useState<"crossover" | "scenario">("crossover");
   const tabBtn = (key: "crossover" | "scenario", label: string) => (
-    <button onClick={() => setTab(key)} aria-selected={tab === key} style={{ padding: "0.4rem 0.8rem", borderRadius: 8, border: "1px solid var(--border)", background: tab === key ? "var(--series-1)" : "var(--surface-1)", color: tab === key ? "#fff" : "var(--text-secondary)", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem" }}>{label}</button>
+    <button onClick={() => setTab(key)} aria-pressed={tab === key} style={{ padding: "0.4rem 0.8rem", borderRadius: 8, border: "1px solid var(--border)", background: tab === key ? "var(--series-1)" : "var(--surface-1)", color: tab === key ? "#fff" : "var(--text-secondary)", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem" }}>{label}</button>
   );
   return (
     <div>
